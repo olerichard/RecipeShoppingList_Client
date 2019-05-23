@@ -5,8 +5,7 @@ import './index.css';
 
 import App from './App';
 import RecipeOverview from './components/recipeOverview/RecipeOverview';
-import CreateRecipe from './components/createRecipe/CreateRecipe';
-import ViewRecipe from './components/viewRecipe/ViewRecipe';
+import Recipe from './components/recipe/Recipe';
 
 
 ReactDOM.render(<App />, document.getElementById('root'));
@@ -15,8 +14,8 @@ ReactDOM.render(
   <BrowserRouter>
     <App>
       <Route path="/" exact component={RecipeOverview} />
-      <Route path="/createRecipe" exact component={CreateRecipe} />
-      <Route path="/recipe/:id" exact component={ViewRecipe} />
+      <Route path="/recipe" exact component={Recipe} />
+      <Route path="/recipe/:id" exact component={Recipe} />
     </App>
   </BrowserRouter>,
   document.getElementById('root')

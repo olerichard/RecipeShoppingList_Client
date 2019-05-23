@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import CloneDeep from 'lodash/cloneDeep'
 import SaveRecipe from '../../actions/SaveRecipe'
 import TextField, { Input } from '@material/react-text-field';
@@ -12,11 +12,11 @@ import Dialog, { DialogTitle, DialogFooter, DialogButton } from '@material/react
 import "@material/react-dialog/dist/dialog.css";
 
 
-export default function CreateRecipe() {
+export default function CreateRecipe({ recipe = {} }) {
   const emptyIngredient = { ingredient: { name: "", valid: false }, unit: { name: "", valid: false }, amount: { name: "", valid: false } }
-  const [RecipeInformation, setRecipeInformation] = useState({ name: '', valid: false });
-  const [Ingredients, setIngredients] = useState([CloneDeep(emptyIngredient)]);
-  const [CookingSteps, setCookingSteps] = useState([""]);
+  const [RecipeInformation, setRecipeInformation] = useState({});
+  const [Ingredients, setIngredients] = useState([]);
+  const [CookingSteps, setCookingSteps] = useState([]);
   const [SaveDialog, setSaveDialog] = useState(false);
 
 
@@ -29,6 +29,32 @@ export default function CreateRecipe() {
     { unit: "GR", name: "Gram" },
     { unit: "PCS", name: "Pieces" }
   ]
+
+
+  useEffect(() => {
+    if (recipe.hasOwnProperty("_id")) {
+      setRecipeInformation({ _id: recipe._id, name: recipe.name, tags: recipe.tags, valid: true });
+      setIngredients(MapIngredients(recipe.ingredients));
+      setCookingSteps([...recipe.cookingSteps])
+    } else {
+      setRecipeInformation({ name: '', valid: false })
+      setIngredients([CloneDeep(emptyIngredient)])
+      setCookingSteps([""])
+
+    }
+  }, [])
+
+  function MapIngredients(ingredients) {
+    return ingredients.map((i) => {
+      const newIngredient = CloneDeep(emptyIngredient);
+      newIngredient.ingredient = { name: i.name, valid: true }
+      newIngredient.amount = { name: i.amount, valid: true }
+      newIngredient.unit = { name: i.unit, valid: true }
+      return newIngredient
+    })
+
+
+  }
 
   async function submitRecipe(action) {
 
