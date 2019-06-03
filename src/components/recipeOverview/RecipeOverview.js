@@ -8,9 +8,13 @@ export default function RecipeOverview() {
   useEffect(() => {
 
     const getRecipes = async () => {
-      const recipes = await GetAllRecipesShortInfo();
+      let arr = []
+      for (let i = 0; i < 20; i++) {
+        const recipes = await GetAllRecipesShortInfo();
+        arr = [...arr, ...recipes]
+      }
 
-      setRecipes([...recipes]);
+      setRecipes([...arr]);
     };
 
     getRecipes();
@@ -18,11 +22,16 @@ export default function RecipeOverview() {
 
   const style = {
     CardContainer: {
+      margin: "1em",
       display: "grid",
-      gridTemplateColumns: " 1fr 1fr 1fr",
+      gridTemplateColumns: "repeat(auto-fill, minmax(25em, 1fr))",
+      columnGap: "1em",
+      rowGap: "1em"
+
+
+
     }
   }
-
 
   return (
     <div style={style.CardContainer}>
@@ -36,12 +45,3 @@ export default function RecipeOverview() {
     </div>
   );
 }
-
-
-/*
-        Recipes.map((Recipe) => {
-          return (
-            <StandardRecipeCard key={Recipe._id} recipe={Recipe} />
-          )
-        })
-*/

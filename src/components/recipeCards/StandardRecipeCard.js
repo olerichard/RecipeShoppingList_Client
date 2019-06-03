@@ -11,12 +11,20 @@ import '@material/react-button/dist/button.css';
 import { Link } from 'react-router-dom'
 
 export default function StandardRecipeCard({ recipe }) {
+
+  const style = {
+    linkStyle: {
+      textDecoration: "none",
+      color: "black"
+    }
+  }
+
   return (
-    <Card className='mdc-card mcd-basic-with-text-over-media'>
-      <Link to={`/Recipe/${recipe._id}`}>
-        <CardPrimaryContent className='mcd-card__primary-action'>
-          <CardMedia className='mcd-card__media' contentClassName='mcd-card__media-content' wide imageUrl={require('../../pictures/' + recipe.picture)} />
-          <h2 className='mdc-card__title'>{recipe.name}</h2>
+    <Card>
+      <Link style={style.linkStyle} to={`/Recipe/${recipe._id}`}>
+        <CardPrimaryContent>
+          <CardMedia wide imageUrl={require('../../pictures/' + recipe.picture)} />
+          <h2 >{recipe.name}</h2>
         </CardPrimaryContent>
       </Link>
       <CardActions>
@@ -24,6 +32,6 @@ export default function StandardRecipeCard({ recipe }) {
           <Button>Open Recipe</Button>
         </CardActionButtons>
       </CardActions>
-    </Card>
+    </Card >
   );
 }

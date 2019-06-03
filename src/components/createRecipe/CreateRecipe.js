@@ -10,9 +10,15 @@ import Select, { Option } from '@material/react-select';
 import '@material/react-select/dist/select.css';
 import Dialog, { DialogTitle, DialogFooter, DialogButton } from '@material/react-dialog';
 import "@material/react-dialog/dist/dialog.css";
+import IconButton from '@material/react-icon-button';
+import '@material/react-icon-button/dist/icon-button.css';
+import Card, {
+  CardMedia
+} from "@material/react-card";
+import '@material/react-card/dist/card.css';
 
 
-export default function CreateRecipe({ recipe = {} }) {
+export default function CreateRecipe({ recipe = {}, setIsEditMode }) {
   const emptyIngredient = { ingredient: { name: "", valid: false }, unit: { name: "", valid: false }, amount: { name: "", valid: false } }
   const [RecipeInformation, setRecipeInformation] = useState({});
   const [Ingredients, setIngredients] = useState([]);
@@ -33,7 +39,7 @@ export default function CreateRecipe({ recipe = {} }) {
 
   useEffect(() => {
     if (recipe.hasOwnProperty("_id")) {
-      setRecipeInformation({ _id: recipe._id, name: recipe.name, tags: recipe.tags, valid: true });
+      setRecipeInformation({ _id: recipe._id, name: recipe.name, tags: recipe.tags, valid: true, picture: recipe.picture });
       setIngredients(MapIngredients(recipe.ingredients));
       setCookingSteps([...recipe.cookingSteps])
     } else {
@@ -59,8 +65,9 @@ export default function CreateRecipe({ recipe = {} }) {
   async function submitRecipe(action) {
 
     if (action === "dismiss") return setSaveDialog(false)
-
-    const result = await SaveRecipe(RecipeInformation, Ingredients, CookingSteps);
+    const pictureData = new FormData();
+    pictureData.append("image", RecipeInformation.file, RecipeInformation.file.name);
+    const result = await SaveRecipe(RecipeInformation, Ingredients, CookingSteps, pictureData);
     console.log(result)
     // DO som handling an clean up after recipe has been saved. 
     // Go to View Page perhaps ? 
@@ -133,83 +140,151 @@ export default function CreateRecipe({ recipe = {} }) {
     setSaveDialog(true)
   }
 
+  function handleImageChange(e) {
+    e.preventDefault();
+
+    let reader = new FileReader();
+    let file = e.target.files[0];
+
+    reader.onloadend = () => {
+      setRecipeInformation({
+        ...RecipeInformation,
+        file: file,
+        picture: reader.result
+      });
+    }
+
+    reader.readAsDataURL(file)
+  }
+
+
   const style = {
     Form: {
       display: "grid",
       gridRowGap: "0.5em",
+      margin: "1em"
+    },
+    FormCard: {
+      display: "grid",
+      gridRowGap: "0.5em",
+      gridTemplateColumns: "minmax(25%, 50em)",
+      justifyContent: "center"
     },
     Ingredients: {
       display: "grid",
       gridRowGap: "0.5em",
+      justifyContent: "center",
     },
     IngredientRow: {
       display: "grid",
-      gridTemplateColumns: "3fr 1fr 2fr",
-      gridColumnGap: "8px",
-
+      gridTemplateColumns: "3fr 1fr 2fr 0.25fr",
+      gridColumnGap: "0.5em",
     },
     Step: {
       display: "grid",
-
     },
     Steps: {
       display: "grid",
       gridRowGap: "0.5em",
+      gridTemplateColumns: "1fr",
+      marginTop: "1em",
+    },
+    Margins: {
+      margins: "0"
+    },
+    Button: {
+      width: "20em"
+    },
+    GridCenter: {
+      padding: "1em",
+      display: "grid",
+      justifyContent: "center"
+    },
+    GridBottom: {
+      padding: "1em",
+      display: "grid",
+      justifyItems: "end"
+    },
+    PictureInput: {
+      width: "0.1px",
+      height: "0.1px",
+      opacity: "0",
+      overflow: "hidden",
+      position: "absolute",
+      zIndex: "-1"
+    },
+    PictureLabel: {
+      padding: "1em",
+      height: "92%",
+      display: "flex",
+      alignItems: "flex-end",
+      justifyContent: "flex-end",
+
     }
   }
 
-
   return (
-    <div>
-      <form style={style.Form} onSubmit={openSaveDialog} autoComplete="off">
-        <TextField label="Recipe name"><Input isValid={RecipeInformation.valid} value={RecipeInformation.name} onChange={(e) => setRecipeInformation({ name: e.target.value, valid: e.target.value.length >= 1 })} /></TextField>
-        <div className="IngredientsBlock" style={style.Ingredients}>
-          {
-            Ingredients.map((ing, idx) => {
-              return (<div style={style.IngredientRow} key={idx}>
-                <TextField label="Ingredient" id={"textField-ingredient-" + idx} trailingIcon={null}><Input isValid={ing.ingredient.valid} id={"ingredient-" + idx} value={ing.ingredient.name} onChange={updateIngedient} /></TextField>
-                <TextField label="Amount"><Input isValid={ing.amount.valid} type="number" id={"amount-" + idx} value={ing.amount.name} onChange={updateIngedient} /></TextField>
-                <Select label="Unit" id={"unit-" + idx} value={ing.unit.name} onChange={updateIngedient}>
-                  {
-                    Units.map((unit) => {
-                      return (
-                        <Option key={unit.unit} value={unit.unit}>{unit.name}</Option>
-                      )
-                    })
-                  }
-                </Select>
-                {/*<IconButton id={idx} onClick={removeIngridient}><MaterialIcon icon='delete_outlined' /></IconButton>*/}
-              </div>)
-            })
-          }
+    <div style={style.FormCard}>
+      <Card>
+        <CardMedia style={style.GridBottom} wide imageUrl={RecipeInformation.picture != null ? RecipeInformation.picture : ""}><Input style={style.PictureInput} type="file" name="file" id="file" accept="image/gif,image/png,image/jpeg" onChange={(e) => handleImageChange(e)} /><div style={style.PictureLabel}><label className="mdc-button mdc-ripple-upgraded mdc-button--raised" htmlFor="file">Choose a picture</label></div></CardMedia>
+        <div>
+          <form style={style.Form} onSubmit={openSaveDialog} autoComplete="off">
+            <h1 style={style.Margins}>Recipe Name:</h1>
+            <TextField ><Input isValid={RecipeInformation.valid} value={RecipeInformation.name} onChange={(e) => setRecipeInformation({ ...RecipeInformation, name: e.target.value, valid: e.target.value.length >= 1 })} /></TextField>
+            <div className="IngredientsBlock" style={style.Ingredients}>
+              <div style={style.IngredientRow}><h2 style={style.Margins} >Ingredient</h2> <h2 style={style.Margins}>Amount</h2><h2 style={style.Margins}>Unit</h2></div>
+              {
+                Ingredients.map((ing, idx) => {
+
+                  return (<div style={style.IngredientRow} key={idx}>
+                    <TextField id={"textField-ingredient-" + idx} trailingIcon={null}><Input isValid={ing.ingredient.valid} id={"ingredient-" + idx} value={ing.ingredient.name} onChange={updateIngedient} /></TextField>
+                    <TextField ><Input isValid={ing.amount.valid} type="number" id={"amount-" + idx} value={ing.amount.name} onChange={updateIngedient} /></TextField>
+                    <Select id={"unit-" + idx} value={ing.unit.name} onChange={updateIngedient}>
+                      {
+                        Units.map((unit) => {
+                          return (
+                            <Option key={unit.unit} value={unit.unit}>{unit.name}</Option>
+                          )
+                        })
+                      }
+                    </Select>
+                    {<IconButton id={idx} onClick={removeIngridient}><MaterialIcon icon='delete' /></IconButton>}
+                  </div>)
+                })
+              }
+              <div style={style.GridCenter}><Button style={style.Button} raised onClick={addEmptyIngredient}>Add Ingredient</Button></div>
+            </div>
+
+            <div className="StepsBlock" >
+              <div className="Steps" style={style.Steps}>{
+                CookingSteps.map((step, idx) => {
+                  return (<div key={idx} >
+                    <TextField style={{ width: "100%" }} trailingIcon={<MaterialIcon role="button" icon="delete" />} onTrailingIconSelect={removeCookingStep.bind(idx)} label={"Step " + (idx + 1)} textarea ><Input style={{ resize: "none", width: "100%" }} id={idx} value={step} onChange={updateCookingStep} /></TextField>
+                  </div>)
+                }
+                )
+              }
+              </div>
+              <div style={style.GridCenter}><Button style={style.Button} raised onClick={addEmptyCookingtStep}>Add Step</Button></div>
+            </div>
+            <br />
+            <Button raised disabled={!isRecipeValid()} type="submit"> Save Recipe </Button>
+            <Dialog
+              onClose={(action) => submitRecipe(action)}
+              open={SaveDialog}>
+              <DialogTitle>Save {RecipeInformation.name} ?</DialogTitle>
+              <DialogFooter>
+                <DialogButton action='dismiss'>No</DialogButton>
+                <DialogButton action='confirm' isDefault>Yes</DialogButton>
+              </DialogFooter>
+            </Dialog>
+            <Button raised onClick={() => setIsEditMode(false)}>Close Edit Mode</Button>
+          </form >
         </div>
-        <Button raised onClick={addEmptyIngredient}>Add Ingredient</Button>
-        <div className="StepsBlock" style={style.Steps}>
-          {
-            CookingSteps.map((step, idx) => {
-              return (<div key={idx} style={style.Step}>
-                <TextField trailingIcon={<MaterialIcon role="button" icon="delete" />} onTrailingIconSelect={removeCookingStep.bind(idx)} label={"Step " + (idx + 1)} textarea ><Input style={{ resize: "none" }} id={idx} value={step} onChange={updateCookingStep} /></TextField>
-                {/*<IconButton id={idx} onClick={removeCookingStep}><MaterialIcon icon='delete_outlined' /></IconButton>*/}
-              </div>)
-            }
-            )
-          }
-        </div>
-        <Button raised onClick={addEmptyCookingtStep}>Add Step</Button>
-        <br />
-        <Button raised disabled={!isRecipeValid()} type="submit"> Submit </Button>
-        <Dialog
-          onClose={(action) => submitRecipe(action)}
-          open={SaveDialog}>
-          <DialogTitle>Save {RecipeInformation.name} ?</DialogTitle>
-          <DialogFooter>
-            <DialogButton action='dismiss'>No</DialogButton>
-            <DialogButton action='confirm' isDefault>Yes</DialogButton>
-          </DialogFooter>
-        </Dialog>
-      </form >
-    </div>
-  )
+      </Card>
+    </div >
+
+  );
 }
 
 
