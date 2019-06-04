@@ -7,7 +7,7 @@ import ViewRecipe from '../viewRecipe/ViewRecipe';
 export default function Recipe({ match }) {
   const [Recipe, setRecipe] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const [isEditMode, setIsEditMode] = useState(true);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
     const getRecipe = async () => {

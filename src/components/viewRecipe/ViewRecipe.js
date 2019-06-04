@@ -10,8 +10,7 @@ import '@material/react-button/dist/button.css';
 
 export default function ViewRecipe({ recipe, setIsEditMode }) {
   const Recipe = { ...recipe };
-
-
+  const picture = new Buffer(Recipe.picture.data.data).toString('base64')
   const style = {
     ViewRecipe: {
       margin: "1em",
@@ -63,7 +62,7 @@ export default function ViewRecipe({ recipe, setIsEditMode }) {
   return (
     <div style={style.ViewRecipe}>
       <Card style={style.Card}>
-        <CardMedia style={style.Picture} wide imageUrl={require('../../pictures/' + Recipe.picture)}><div style={style.Name}><h1 style={style.NameText}>{Recipe.name}</h1></div></CardMedia>
+        <CardMedia style={style.Picture} wide imageUrl={`data:${Recipe.picture.contentType};base64,${picture}`}><div style={style.Name}><h1 style={style.NameText}>{Recipe.name}</h1></div></CardMedia>
 
         <ul>  <h2>Ingredients:</h2>
           {Recipe.ingredients.map((ing, idx) => {

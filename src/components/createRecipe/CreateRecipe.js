@@ -46,7 +46,6 @@ export default function CreateRecipe({ recipe = {}, setIsEditMode }) {
       setRecipeInformation({ name: '', valid: false })
       setIngredients([CloneDeep(emptyIngredient)])
       setCookingSteps([""])
-
     }
   }, [])
 
@@ -63,11 +62,9 @@ export default function CreateRecipe({ recipe = {}, setIsEditMode }) {
   }
 
   async function submitRecipe(action) {
-
     if (action === "dismiss") return setSaveDialog(false)
-    const pictureData = new FormData();
-    pictureData.append("image", RecipeInformation.file, RecipeInformation.file.name);
-    const result = await SaveRecipe(RecipeInformation, Ingredients, CookingSteps, pictureData);
+
+    const result = await SaveRecipe(RecipeInformation, Ingredients, CookingSteps);
     console.log(result)
     // DO som handling an clean up after recipe has been saved. 
     // Go to View Page perhaps ? 
@@ -226,7 +223,7 @@ export default function CreateRecipe({ recipe = {}, setIsEditMode }) {
   return (
     <div style={style.FormCard}>
       <Card>
-        <CardMedia style={style.GridBottom} wide imageUrl={RecipeInformation.picture != null ? RecipeInformation.picture : ""}><Input style={style.PictureInput} type="file" name="file" id="file" accept="image/gif,image/png,image/jpeg" onChange={(e) => handleImageChange(e)} /><div style={style.PictureLabel}><label className="mdc-button mdc-ripple-upgraded mdc-button--raised" htmlFor="file">Choose a picture</label></div></CardMedia>
+        <CardMedia style={style.GridBottom} wide imageUrl={RecipeInformation.picture != null ? `data:${RecipeInformation.picture.contentType};base64,${new Buffer(RecipeInformation.picture.data.data).toString('base64')}` : ""}><Input style={style.PictureInput} type="file" name="file" id="file" accept="image/gif,image/png,image/jpeg" onChange={(e) => handleImageChange(e)} /><div style={style.PictureLabel}><label className="mdc-button mdc-ripple-upgraded mdc-button--raised" htmlFor="file">Choose a picture</label></div></CardMedia>
         <div>
           <form style={style.Form} onSubmit={openSaveDialog} autoComplete="off">
             <h1 style={style.Margins}>Recipe Name:</h1>
@@ -283,7 +280,6 @@ export default function CreateRecipe({ recipe = {}, setIsEditMode }) {
         </div>
       </Card>
     </div >
-
   );
 }
 

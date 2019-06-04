@@ -12,6 +12,8 @@ import { Link } from 'react-router-dom'
 
 export default function StandardRecipeCard({ recipe }) {
 
+  const picture = new Buffer(recipe.picture.data.data).toString('base64')
+
   const style = {
     linkStyle: {
       textDecoration: "none",
@@ -23,7 +25,7 @@ export default function StandardRecipeCard({ recipe }) {
     <Card>
       <Link style={style.linkStyle} to={`/Recipe/${recipe._id}`}>
         <CardPrimaryContent>
-          <CardMedia wide imageUrl={require('../../pictures/' + recipe.picture)} />
+          <CardMedia wide imageUrl={`data:${recipe.picture.contentType};base64,${picture}`} />
           <h2 >{recipe.name}</h2>
         </CardPrimaryContent>
       </Link>
