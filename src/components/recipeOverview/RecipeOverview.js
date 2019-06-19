@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { GetAllRecipesShortInfo } from '../../actions/GetRecipe'
+import { GetAllRecipesShortInfo } from '../../actions/Recipe/GetRecipe'
 import StandardRecipeCard from '../recipeCards/StandardRecipeCard';
+
+
 
 export default function RecipeOverview() {
   const [Recipes, setRecipes] = useState([]);
@@ -9,6 +11,7 @@ export default function RecipeOverview() {
 
     const getRecipes = async () => {
       let arr = []
+      //Just looping this to fill up the app little on load
       for (let i = 0; i < 20; i++) {
         const recipes = await GetAllRecipesShortInfo();
         arr = [...arr, ...recipes]
@@ -27,9 +30,6 @@ export default function RecipeOverview() {
       gridTemplateColumns: "repeat(auto-fill, minmax(25em, 1fr))",
       columnGap: "1em",
       rowGap: "1em"
-
-
-
     }
   }
 

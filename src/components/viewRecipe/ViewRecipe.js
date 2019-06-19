@@ -6,19 +6,28 @@ import Card, {
 import '@material/react-card/dist/card.css';
 import Button from '@material/react-button'
 import '@material/react-button/dist/button.css';
+import { useUser } from '../../context/user-context';
 
 
 export default function ViewRecipe({ recipe, setIsEditMode }) {
   const Recipe = { ...recipe };
   const picture = new Buffer(Recipe.picture.data.data).toString('base64')
+  const user = useUser();
+
   const style = {
     ViewRecipe: {
       margin: "1em",
       display: "grid",
+      gridRowGap: "0.5em",
       gridTemplateColumns: "minmax(25%, 50em)",
-      justifyContent: "center",
+      justifyContent: "center"
     },
     Card: {
+      margin: "1em"
+    },
+    Content: {
+      display: "grid",
+      gridRowGap: "0.5em",
       margin: "1em"
     },
     Ingredients: {
@@ -55,7 +64,9 @@ export default function ViewRecipe({ recipe, setIsEditMode }) {
       textShadow: "1px 1px  rgba(0,0,0,0.5)"
     },
     Picture: {
+      padding: "1em",
       display: "grid",
+      justifyItems: "end"
     }
   }
 
@@ -63,26 +74,28 @@ export default function ViewRecipe({ recipe, setIsEditMode }) {
     <div style={style.ViewRecipe}>
       <Card style={style.Card}>
         <CardMedia style={style.Picture} wide imageUrl={`data:${Recipe.picture.contentType};base64,${picture}`}><div style={style.Name}><h1 style={style.NameText}>{Recipe.name}</h1></div></CardMedia>
+        <div style={style.Content}>
+          <ul>  <h2>Ingredients:</h2>
+            {Recipe.ingredients.map((ing, idx) => {
+              return (
+                <ul style={style.IngredientRow} key={`ing${idx}`}>
+                  <li> {ing.amount} {ing.unit} off {ing.name}</li>
+                </ul>
+              )
+            })}
+          </ul>
+          <ul> <h2>Steps:</h2>
+            {Recipe.cookingSteps.map((step, idx) => {
+              return (
+                <li key={`step${idx}`}>
+                  {step}
+                </li>
+              )
+            })}
+          </ul>
+          {user.loggedIn ? <Button raised onClick={() => setIsEditMode(true)}>Edit Recipe</Button> : null}
 
-        <ul>  <h2>Ingredients:</h2>
-          {Recipe.ingredients.map((ing, idx) => {
-            return (
-              <ul style={style.IngredientRow} key={`ing${idx}`}>
-                <li> {ing.amount} {ing.unit} off {ing.name}</li>
-              </ul>
-            )
-          })}
-        </ul>
-        <ul> <h2>Steps:</h2>
-          {Recipe.cookingSteps.map((step, idx) => {
-            return (
-              <li key={`step${idx}`}>
-                {step}
-              </li>
-            )
-          })}
-        </ul>
-        <Button raised onClick={() => setIsEditMode(true)}>Edit Recipe</Button>
+        </div>
       </Card>
     </div>
   );

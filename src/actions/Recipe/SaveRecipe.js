@@ -8,6 +8,7 @@ export default async function saveRecipe({ name, file }, ingredients, cookingSte
   recipeData.append("name", name);
   recipeData.append("cookingSteps", cookingSteps);
   recipeData.append("ingredients", JSON.stringify(cleanIngredientsList));
+  // recipeData.append("user", JSON.stringify(user));
 
   const axiosData = {
     method: 'post',

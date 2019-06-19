@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GetRecipeById } from '../../actions/GetRecipe'
+import { GetRecipeById } from '../../actions/Recipe/GetRecipe'
 import CreateRecipe from '../createRecipe/CreateRecipe';
 import ViewRecipe from '../viewRecipe/ViewRecipe';
 

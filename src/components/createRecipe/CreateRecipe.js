@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import CloneDeep from 'lodash/cloneDeep'
-import SaveRecipe from '../../actions/SaveRecipe'
+import SaveRecipe from '../../actions/Recipe/SaveRecipe'
 import TextField, { Input } from '@material/react-text-field';
 import '@material/react-text-field/dist/text-field.css';
 import Button from '@material/react-button'
@@ -16,14 +16,17 @@ import Card, {
   CardMedia
 } from "@material/react-card";
 import '@material/react-card/dist/card.css';
+import { useUser } from '../../context/user-context';
+import { Redirect } from 'react-router-dom';
 
 
-export default function CreateRecipe({ recipe = {}, setIsEditMode }) {
+function CreateRecipe({ recipe = {}, setIsEditMode }) {
   const emptyIngredient = { ingredient: { name: "", valid: false }, unit: { name: "", valid: false }, amount: { name: "", valid: false } }
   const [RecipeInformation, setRecipeInformation] = useState({});
   const [Ingredients, setIngredients] = useState([]);
   const [CookingSteps, setCookingSteps] = useState([]);
   const [SaveDialog, setSaveDialog] = useState(false);
+  const user = useUser();
 
 
   const Units = [
@@ -36,18 +39,18 @@ export default function CreateRecipe({ recipe = {}, setIsEditMode }) {
     { unit: "PCS", name: "Pieces" }
   ]
 
-
-  useEffect(() => {
-    if (recipe.hasOwnProperty("_id")) {
-      setRecipeInformation({ _id: recipe._id, name: recipe.name, tags: recipe.tags, valid: true, picture: recipe.picture });
-      setIngredients(MapIngredients(recipe.ingredients));
-      setCookingSteps([...recipe.cookingSteps])
-    } else {
-      setRecipeInformation({ name: '', valid: false })
-      setIngredients([CloneDeep(emptyIngredient)])
-      setCookingSteps([""])
-    }
-  }, [])
+  
+    useEffect(() => {
+      if (recipe.hasOwnProperty("_id")) {
+        setRecipeInformation({ _id: recipe._id, name: recipe.name, tags: recipe.tags, valid: true, picture: recipe.picture });
+        setIngredients(MapIngredients(recipe.ingredients));
+        setCookingSteps([...recipe.cookingSteps])
+      } else {
+        setRecipeInformation({ name: '', valid: false })
+        setIngredients([CloneDeep(emptyIngredient)])
+        setCookingSteps([""])
+      }
+    }, []) 
 
   function MapIngredients(ingredients) {
     return ingredients.map((i) => {
@@ -65,7 +68,6 @@ export default function CreateRecipe({ recipe = {}, setIsEditMode }) {
     if (action === "dismiss") return setSaveDialog(false)
 
     const result = await SaveRecipe(RecipeInformation, Ingredients, CookingSteps);
-    console.log(result)
     // DO som handling an clean up after recipe has been saved. 
     // Go to View Page perhaps ? 
     setSaveDialog(false)
@@ -161,7 +163,11 @@ export default function CreateRecipe({ recipe = {}, setIsEditMode }) {
       gridRowGap: "0.5em",
       margin: "1em"
     },
+    Card: {
+      margin: "1em"
+    },
     FormCard: {
+      margin: "1em",
       display: "grid",
       gridRowGap: "0.5em",
       gridTemplateColumns: "minmax(25%, 50em)",
@@ -220,68 +226,71 @@ export default function CreateRecipe({ recipe = {}, setIsEditMode }) {
     }
   }
 
+
   return (
-    <div style={style.FormCard}>
-      <Card>
-        <CardMedia style={style.GridBottom} wide imageUrl={RecipeInformation.picture != null ? `data:${RecipeInformation.picture.contentType};base64,${new Buffer(RecipeInformation.picture.data.data).toString('base64')}` : ""}><Input style={style.PictureInput} type="file" name="file" id="file" accept="image/gif,image/png,image/jpeg" onChange={(e) => handleImageChange(e)} /><div style={style.PictureLabel}><label className="mdc-button mdc-ripple-upgraded mdc-button--raised" htmlFor="file">Choose a picture</label></div></CardMedia>
-        <div>
-          <form style={style.Form} onSubmit={openSaveDialog} autoComplete="off">
-            <h1 style={style.Margins}>Recipe Name:</h1>
-            <TextField ><Input isValid={RecipeInformation.valid} value={RecipeInformation.name} onChange={(e) => setRecipeInformation({ ...RecipeInformation, name: e.target.value, valid: e.target.value.length >= 1 })} /></TextField>
-            <div className="IngredientsBlock" style={style.Ingredients}>
-              <div style={style.IngredientRow}><h2 style={style.Margins} >Ingredient</h2> <h2 style={style.Margins}>Amount</h2><h2 style={style.Margins}>Unit</h2></div>
-              {
-                Ingredients.map((ing, idx) => {
+    <React.Fragment>
+      {!user.loggedIn ? <Redirect to='/' /> :
+        <div style={style.FormCard}>
+          <Card style={style.Card}>
+            <CardMedia style={style.GridBottom} wide imageUrl={RecipeInformation.picture != null ? `data:${RecipeInformation.picture.contentType};base64,${new Buffer(RecipeInformation.picture.data.data).toString('base64')}` : ""}><Input style={style.PictureInput} type="file" name="file" id="file" accept="image/gif,image/png,image/jpeg" onChange={(e) => handleImageChange(e)} /><div style={style.PictureLabel}><label className="mdc-button mdc-ripple-upgraded mdc-button--raised" htmlFor="file">Choose a picture</label></div></CardMedia>
+            <div>
+              <form style={style.Form} onSubmit={openSaveDialog} autoComplete="off">
+                <h1 style={style.Margins}>Recipe Name:</h1>
+                <TextField ><Input isValid={RecipeInformation.valid} value={RecipeInformation.name} onChange={(e) => setRecipeInformation({ ...RecipeInformation, name: e.target.value, valid: e.target.value.length >= 1 })} /></TextField>
+                <div className="IngredientsBlock" style={style.Ingredients}>
+                  <div style={style.IngredientRow}><h2 style={style.Margins} >Ingredient</h2> <h2 style={style.Margins}>Amount</h2><h2 style={style.Margins}>Unit</h2></div>
+                  {
+                    Ingredients.map((ing, idx) => {
+                      return (<div style={style.IngredientRow} key={idx}>
+                        <TextField id={"textField-ingredient-" + idx} trailingIcon={null}><Input isValid={ing.ingredient.valid} id={"ingredient-" + idx} value={ing.ingredient.name} onChange={updateIngedient} /></TextField>
+                        <TextField ><Input isValid={ing.amount.valid} type="number" id={"amount-" + idx} value={ing.amount.name} onChange={updateIngedient} /></TextField>
+                        <Select id={"unit-" + idx} value={ing.unit.name} onChange={updateIngedient}>
+                          {
+                            Units.map((unit) => {
+                              return (
+                                <Option key={unit.unit} value={unit.unit}>{unit.name}</Option>
+                              )
+                            })
+                          }
+                        </Select>
+                        {<IconButton id={idx} onClick={removeIngridient}><MaterialIcon icon='delete' /></IconButton>}
+                      </div>)
+                    })
+                  }
+                  <div style={style.GridCenter}><Button style={style.Button} raised onClick={addEmptyIngredient}>Add Ingredient</Button></div>
+                </div>
 
-                  return (<div style={style.IngredientRow} key={idx}>
-                    <TextField id={"textField-ingredient-" + idx} trailingIcon={null}><Input isValid={ing.ingredient.valid} id={"ingredient-" + idx} value={ing.ingredient.name} onChange={updateIngedient} /></TextField>
-                    <TextField ><Input isValid={ing.amount.valid} type="number" id={"amount-" + idx} value={ing.amount.name} onChange={updateIngedient} /></TextField>
-                    <Select id={"unit-" + idx} value={ing.unit.name} onChange={updateIngedient}>
-                      {
-                        Units.map((unit) => {
-                          return (
-                            <Option key={unit.unit} value={unit.unit}>{unit.name}</Option>
-                          )
-                        })
-                      }
-                    </Select>
-                    {<IconButton id={idx} onClick={removeIngridient}><MaterialIcon icon='delete' /></IconButton>}
-                  </div>)
-                })
-              }
-              <div style={style.GridCenter}><Button style={style.Button} raised onClick={addEmptyIngredient}>Add Ingredient</Button></div>
+                <div className="StepsBlock" >
+                  <div className="Steps" style={style.Steps}>{
+                    CookingSteps.map((step, idx) => {
+                      return (<div key={idx} >
+                        <TextField style={{ width: "100%" }} trailingIcon={<MaterialIcon role="button" icon="delete" />} onTrailingIconSelect={removeCookingStep.bind(idx)} label={"Step " + (idx + 1)} textarea ><Input style={{ resize: "none", width: "100%" }} id={idx} value={step} onChange={updateCookingStep} /></TextField>
+                      </div>)
+                    }
+                    )
+                  }
+                  </div>
+                  <div style={style.GridCenter}><Button style={style.Button} raised onClick={addEmptyCookingtStep}>Add Step</Button></div>
+                </div>
+                <br />
+                <Button raised disabled={!isRecipeValid()} type="submit"> Save Recipe </Button>
+                <Dialog
+                  onClose={(action) => submitRecipe(action)}
+                  open={SaveDialog}>
+                  <DialogTitle>Save {RecipeInformation.name} ?</DialogTitle>
+                  <DialogFooter>
+                    <DialogButton action='dismiss'>No</DialogButton>
+                    <DialogButton action='confirm' isDefault>Yes</DialogButton>
+                  </DialogFooter>
+                </Dialog>
+                <Button raised onClick={() => setIsEditMode(false)}>Close Edit Mode</Button>
+              </form >
             </div>
-
-            <div className="StepsBlock" >
-              <div className="Steps" style={style.Steps}>{
-                CookingSteps.map((step, idx) => {
-                  return (<div key={idx} >
-                    <TextField style={{ width: "100%" }} trailingIcon={<MaterialIcon role="button" icon="delete" />} onTrailingIconSelect={removeCookingStep.bind(idx)} label={"Step " + (idx + 1)} textarea ><Input style={{ resize: "none", width: "100%" }} id={idx} value={step} onChange={updateCookingStep} /></TextField>
-                  </div>)
-                }
-                )
-              }
-              </div>
-              <div style={style.GridCenter}><Button style={style.Button} raised onClick={addEmptyCookingtStep}>Add Step</Button></div>
-            </div>
-            <br />
-            <Button raised disabled={!isRecipeValid()} type="submit"> Save Recipe </Button>
-            <Dialog
-              onClose={(action) => submitRecipe(action)}
-              open={SaveDialog}>
-              <DialogTitle>Save {RecipeInformation.name} ?</DialogTitle>
-              <DialogFooter>
-                <DialogButton action='dismiss'>No</DialogButton>
-                <DialogButton action='confirm' isDefault>Yes</DialogButton>
-              </DialogFooter>
-            </Dialog>
-            <Button raised onClick={() => setIsEditMode(false)}>Close Edit Mode</Button>
-          </form >
-        </div>
-      </Card>
-    </div >
-  );
+          </Card>
+        </div >}
+    </React.Fragment>);
 }
 
 
 
+export default CreateRecipe;
