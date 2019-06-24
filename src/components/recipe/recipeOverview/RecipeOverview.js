@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GetAllRecipesShortInfo } from '../../actions/Recipe/GetRecipe'
+import { GetAllRecipesShortInfo } from '../../../actions/Recipe/GetRecipe'
 import StandardRecipeCard from '../recipeCards/StandardRecipeCard';
 
 
