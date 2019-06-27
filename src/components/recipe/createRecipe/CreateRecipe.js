@@ -12,14 +12,13 @@ import Dialog, { DialogTitle, DialogFooter, DialogButton } from '@material/react
 import "@material/react-dialog/dist/dialog.css";
 import IconButton from '@material/react-icon-button';
 import '@material/react-icon-button/dist/icon-button.css';
-import Card, {
-  CardMedia
-} from "@material/react-card";
+import Card, { CardMedia } from "@material/react-card";
 import '@material/react-card/dist/card.css';
 import { useUser } from '../../../context/user-context';
+import { Redirect, withRouter } from 'react-router-dom';
 
 
-function CreateRecipe({ recipe }) {
+function CreateRecipe({ recipe, history }) {
   const emptyIngredient = { ingredient: { name: "", valid: false }, unit: { name: "", valid: false }, amount: { name: "", valid: false } }
   const [RecipeInformation, setRecipeInformation] = useState({});
   const [Ingredients, setIngredients] = useState([]);
@@ -38,7 +37,6 @@ function CreateRecipe({ recipe }) {
     { unit: "GR", name: "Gram" },
     { unit: "PCS", name: "Pieces" }
   ]
-
 
   useEffect(() => {
     if (recipe !== undefined && recipe.hasOwnProperty("_id")) {
@@ -68,17 +66,20 @@ function CreateRecipe({ recipe }) {
   async function submitRecipe(action) {
     if (action === "dismiss") return setSaveDialog(false)
 
+    const result = newRecipe
+      ? await SaveNewRecipe(RecipeInformation.name, RecipeInformation.pictureLocal.file, Ingredients, CookingSteps)
+      : await SaveEditRecipe(RecipeInformation, Ingredients, CookingSteps);
 
-    if (newRecipe) {
-      const result = await SaveNewRecipe(RecipeInformation.name, RecipeInformation.pictureLocal.file, Ingredients, CookingSteps);
-    } else {
-      const result = await SaveEditRecipe(RecipeInformation, Ingredients, CookingSteps);
-    }
+    if (result.id !== undefined)
+      history.push("/Recipe/" + result.id)
 
+    setSaveDialog(false);
+  }
 
-    // DO som handling an clean up after recipe has been saved. 
-    // Go to View Page perhaps ? 
-    setSaveDialog(false)
+  function close() {
+    recipe.hasOwnProperty("_id") ?
+      history.push("/Recipe/" + recipe._id) :
+      history.push("/")
 
   }
 
@@ -252,72 +253,73 @@ function CreateRecipe({ recipe }) {
 
   return (
     <React.Fragment>
-      <div style={style.FormCard}>
-        <Card style={style.Card}>
-          <CardMedia style={style.GridBottom} wide imageUrl={getPicture()}>
-            <Input style={style.PictureInput} type="file" name="file" id="file" accept="image/gif,image/png,image/jpeg" onChange={(e) => handleImageChange(e)} />
-            <div style={style.PictureLabel}>
-              <label className="mdc-button mdc-ripple-upgraded mdc-button--raised" htmlFor="file">Choose a picture</label>
-            </div>
-          </CardMedia>
-          <div>
-            <form style={style.Form} onSubmit={openSaveDialog} autoComplete="off">
-              <h1 style={style.Margins}>Recipe Name:</h1>
-              <TextField ><Input isValid={RecipeInformation.valid} value={RecipeInformation.name} onChange={(e) => setRecipeInformation({ ...RecipeInformation, name: e.target.value, valid: e.target.value.length >= 1 })} /></TextField>
-              <div className="IngredientsBlock" style={style.Ingredients}>
-                <div style={style.IngredientRow}><h2 style={style.Margins} >Ingredient</h2> <h2 style={style.Margins}>Amount</h2><h2 style={style.Margins}>Unit</h2></div>
-                {
-                  Ingredients.map((ing, idx) => {
-                    return (<div style={style.IngredientRow} key={idx}>
-                      <TextField id={"textField-ingredient-" + idx} trailingIcon={null}><Input isValid={ing.ingredient.valid} id={"ingredient-" + idx} value={ing.ingredient.name} onChange={updateIngedient} /></TextField>
-                      <TextField ><Input isValid={ing.amount.valid} type="number" id={"amount-" + idx} value={ing.amount.name} onChange={updateIngedient} /></TextField>
-                      <Select id={"unit-" + idx} value={ing.unit.name} onChange={updateIngedient}>
-                        {
-                          Units.map((unit) => {
-                            return (
-                              <Option key={unit.unit} value={unit.unit}>{unit.name}</Option>
-                            )
-                          })
-                        }
-                      </Select>
-                      {<IconButton id={idx} onClick={removeIngridient}><MaterialIcon icon='delete' /></IconButton>}
-                    </div>)
-                  })
-                }
-                <div style={style.GridCenter}><Button style={style.Button} raised onClick={addEmptyIngredient}>Add Ingredient</Button></div>
+      {user.loggedIn ?
+        (<div style={style.FormCard}>
+          <Card style={style.Card}>
+            <CardMedia style={style.GridBottom} wide imageUrl={getPicture()}>
+              <Input style={style.PictureInput} type="file" name="file" id="file" accept="image/gif,image/png,image/jpeg" onChange={(e) => handleImageChange(e)} />
+              <div style={style.PictureLabel}>
+                <label className="mdc-button mdc-ripple-upgraded mdc-button--raised" htmlFor="file">Choose a picture</label>
               </div>
-
-              <div className="StepsBlock" >
-                <div className="Steps" style={style.Steps}>{
-                  CookingSteps.map((step, idx) => {
-                    return (<div key={idx} >
-                      <TextField style={{ width: "100%" }} trailingIcon={<MaterialIcon role="button" icon="delete" />} onTrailingIconSelect={removeCookingStep.bind(idx)} label={"Step " + (idx + 1)} textarea ><Input style={{ resize: "none", width: "100%" }} id={idx} value={step} onChange={updateCookingStep} /></TextField>
-                    </div>)
+            </CardMedia>
+            <div>
+              <form style={style.Form} onSubmit={openSaveDialog} autoComplete="off">
+                <h1 style={style.Margins}>Recipe Name:</h1>
+                <TextField ><Input isValid={RecipeInformation.valid} value={RecipeInformation.name} onChange={(e) => setRecipeInformation({ ...RecipeInformation, name: e.target.value, valid: e.target.value.length >= 1 })} /></TextField>
+                <div className="IngredientsBlock" style={style.Ingredients}>
+                  <div style={style.IngredientRow}><h2 style={style.Margins} >Ingredient</h2> <h2 style={style.Margins}>Amount</h2><h2 style={style.Margins}>Unit</h2></div>
+                  {
+                    Ingredients.map((ing, idx) => {
+                      return (<div style={style.IngredientRow} key={idx}>
+                        <TextField id={"textField-ingredient-" + idx} trailingIcon={null}><Input isValid={ing.ingredient.valid} id={"ingredient-" + idx} value={ing.ingredient.name} onChange={updateIngedient} /></TextField>
+                        <TextField ><Input isValid={ing.amount.valid} type="number" id={"amount-" + idx} value={ing.amount.name} onChange={updateIngedient} /></TextField>
+                        <Select id={"unit-" + idx} value={ing.unit.name} onChange={updateIngedient}>
+                          {
+                            Units.map((unit) => {
+                              return (
+                                <Option key={unit.unit} value={unit.unit}>{unit.name}</Option>
+                              )
+                            })
+                          }
+                        </Select>
+                        {<IconButton id={idx} onClick={removeIngridient}><MaterialIcon icon='delete' /></IconButton>}
+                      </div>)
+                    })
                   }
-                  )
-                }
+                  <div style={style.GridCenter}><Button style={style.Button} raised onClick={addEmptyIngredient}>Add Ingredient</Button></div>
                 </div>
-                <div style={style.GridCenter}><Button style={style.Button} raised onClick={addEmptyCookingtStep}>Add Step</Button></div>
-              </div>
-              <br />
-              <Button raised disabled={!isRecipeValid()} type="submit"> Save Recipe </Button>
-              <Dialog
-                onClose={(action) => submitRecipe(action)}
-                open={SaveDialog}>
-                <DialogTitle>Save {RecipeInformation.name} ?</DialogTitle>
-                <DialogFooter>
-                  <DialogButton action='dismiss'>No</DialogButton>
-                  <DialogButton action='confirm' isDefault>Yes</DialogButton>
-                </DialogFooter>
-              </Dialog>
-              <Button raised onClick={() => ""}>Close Edit Mode</Button>
-            </form >
-          </div>
-        </Card>
-      </div >
+
+                <div className="StepsBlock" >
+                  <div className="Steps" style={style.Steps}>{
+                    CookingSteps.map((step, idx) => {
+                      return (<div key={idx} >
+                        <TextField style={{ width: "100%" }} trailingIcon={<MaterialIcon role="button" icon="delete" />} onTrailingIconSelect={removeCookingStep.bind(idx)} label={"Step " + (idx + 1)} textarea ><Input style={{ resize: "none", width: "100%" }} id={idx} value={step} onChange={updateCookingStep} /></TextField>
+                      </div>)
+                    }
+                    )
+                  }
+                  </div>
+                  <div style={style.GridCenter}><Button style={style.Button} raised onClick={addEmptyCookingtStep}>Add Step</Button></div>
+                </div>
+                <br />
+                <Button raised disabled={!isRecipeValid()} type="submit"> Save Recipe </Button>
+                <Dialog
+                  onClose={(action) => submitRecipe(action)}
+                  open={SaveDialog}>
+                  <DialogTitle>Save {RecipeInformation.name} ?</DialogTitle>
+                  <DialogFooter>
+                    <DialogButton action='dismiss'>No</DialogButton>
+                    <DialogButton action='confirm' isDefault>Yes</DialogButton>
+                  </DialogFooter>
+                </Dialog>
+                <Button raised onClick={close}>Close Edit Mode</Button>
+              </form >
+            </div>
+          </Card>
+        </div >) : (<Redirect to="/" />)}
     </React.Fragment>);
 }
 
 
 
-export default CreateRecipe;
+export default withRouter(CreateRecipe);

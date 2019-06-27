@@ -9,9 +9,10 @@ import '@material/react-button/dist/button.css';
 import { useUser } from '../../../context/user-context';
 import { GetRecipeById } from '../../../actions/Recipe/GetRecipe'
 import { Redirect, Link } from 'react-router-dom';
+import queryString from 'query-string'
 
 
-export default function ViewRecipe({ match }) {
+export default function ViewRecipe({ location }) {
   const [Recipe, setRecipe] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [RecipeFound, setRecipeFound] = useState(true);
@@ -21,9 +22,10 @@ export default function ViewRecipe({ match }) {
 
 
   useEffect(() => {
-    const getRecipe = async () => {
+    const getRecipe = async (id) => {
       setIsLoading(true)
-      const recipe = await GetRecipeById(match.params.id)
+
+      const recipe = await GetRecipeById(id)
       console.log(recipe);
       if (recipe === null) {
         setRecipeFound(false);
@@ -33,11 +35,13 @@ export default function ViewRecipe({ match }) {
       }
       setIsLoading(false)
     };
-    if (match.params.id === undefined) {
+
+    const values = queryString.parse(location.search)
+    if (values.id === undefined) {
       setRecipeFound(false);
       setIsLoading(false);
     } else {
-      getRecipe();
+      getRecipe(values.id);
     }
 
   }, [])
@@ -131,7 +135,8 @@ export default function ViewRecipe({ match }) {
                     )
                   })}
                 </ul>
-                {user.loggedIn ? (<Link style={style.EditRecipeLink} to={{ pathname: '/recipe/edit/' + Recipe._id, state: { recipe: Recipe } }}><Button raised>Edit Recipe</Button></Link>) : null}
+
+                {user.loggedIn ? (<Link style={style.EditRecipeLink} to={'/recipe/edit?id=' + Recipe._id}><Button raised>Edit Recipe</Button></Link>) : null}
 
               </div>
             </Card>

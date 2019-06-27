@@ -18,8 +18,8 @@ ReactDOM.render(
   <BrowserRouter>
     <App>
       <Route path="/" exact component={RecipeOverview} />
-      <Route path="/recipe/:id" exact component={ViewRecipe} />
-      <Route path="/recipe/edit/:id" exact component={EditRecipe} />
+      <Route path="/recipe/" exact component={ViewRecipe} />
+      <Route path="/recipe/edit" exact component={EditRecipe} />
       <Route path="/recipe/createRecipe" exact component={CreateRecipe} />
       <Route path="/login" exact component={Login} />
       <Route path="/signup" exact component={SignUp} />

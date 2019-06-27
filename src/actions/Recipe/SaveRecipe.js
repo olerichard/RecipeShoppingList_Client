@@ -7,7 +7,9 @@ export async function SaveNewRecipe({ name, file }, ingredients, cookingSteps) {
   recipeData.append("cookingSteps", cookingSteps);
   recipeData.append("ingredients", JSON.stringify(cleanIngredientsList(ingredients)));
 
-  return await SendRecipe(recipeData, "saveNewRecipe")
+  const response = await SendRecipe(recipeData, "saveNewRecipe")
+
+  return response.data
 }
 
 export async function SaveEditRecipe(information, ingredients, cookingSteps) {
@@ -18,10 +20,12 @@ export async function SaveEditRecipe(information, ingredients, cookingSteps) {
 
   recipeData.append("id", information._id);
   recipeData.append("name", information.name);
-  recipeData.append("cookingSteps", cookingSteps);
+  recipeData.append("cookingSteps", JSON.stringify(cookingSteps));
   recipeData.append("ingredients", JSON.stringify(cleanIngredientsList(ingredients)));
 
-  return await SendRecipe(recipeData, "saveUpdatedRecipe")
+  const response = await SendRecipe(recipeData, "saveUpdatedRecipe")
+
+  return response.data
 
 }
 
@@ -32,8 +36,7 @@ async function SendRecipe(data, endpoint) {
     data: data
   }
 
-  const respons = await axios(axiosData);
-  return respons.data.success
+  return await axios(axiosData);
 }
 
 

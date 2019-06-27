@@ -23,7 +23,7 @@ export default function StandardRecipeCard({ recipe }) {
 
   return (
     <Card>
-      <Link style={style.linkStyle} to={`/Recipe/${recipe._id}`}>
+      <Link style={style.linkStyle} to={`/recipe?id=${recipe._id}`}>
         <CardPrimaryContent>
           <CardMedia wide imageUrl={`data:${recipe.picture.contentType};base64,${picture}`} />
           <h2 >{recipe.name}</h2>

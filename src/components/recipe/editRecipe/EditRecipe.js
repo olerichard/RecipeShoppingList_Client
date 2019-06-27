@@ -2,29 +2,32 @@ import React, { useState, useEffect } from 'react';
 import { GetRecipeById } from '../../../actions/Recipe/GetRecipe'
 import CreateRecipe from '../createRecipe/CreateRecipe';
 import { Redirect } from 'react-router-dom';
+import queryString from 'query-string'
 
 
-export default function EditRecipe({ match }) {
+export default function EditRecipe({ location }) {
   const [Recipe, setRecipe] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [RecipeFound, setRecipeFound] = useState(true);
 
   useEffect(() => {
-    const getRecipe = async () => {
+    const getRecipe = async (id) => {
       setIsLoading(true)
-      const recipe = await GetRecipeById(match.params.id)
-      if (recipe === null)
+      const fetchedRecipe = await GetRecipeById(id)
+      if (fetchedRecipe === null)
         setRecipeFound(false);
 
-      setRecipe(recipe);
+      setRecipe({ ...fetchedRecipe });
       setIsLoading(false)
     };
-    if (match.params.id === undefined) {
-      setRecipeFound(false);
-    } else {
-      getRecipe();
-    }
+    const values = queryString.parse(location.search)
 
+    if (values.id === undefined) {
+      setRecipeFound(false);
+      setIsLoading(false);
+    } else {
+      getRecipe(values.id);
+    }
   }, [])
 
   const style = {
