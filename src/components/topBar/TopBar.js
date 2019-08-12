@@ -28,7 +28,7 @@ export default function TopBar({ title }) {
   const user = useUser();
 
   return (
-    <div>
+    <div style={{ gridArea: "TopBar" }}>
       <TopAppBar>
         <TopAppBarRow>
           <TopAppBarSection align='start'>

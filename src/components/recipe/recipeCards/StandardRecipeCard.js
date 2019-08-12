@@ -31,7 +31,12 @@ export default function StandardRecipeCard({ recipe }) {
       </Link>
       <CardActions>
         <CardActionButtons>
-          <Button>Open Recipe</Button>
+          <Link style={style.linkStyle} to={`/recipe?id=${recipe._id}`}>
+            <Button>Open Recipe</Button>
+          </Link>
+        </CardActionButtons>
+        <CardActionButtons>
+          <Button onClick={AddToShoppingList(recipe._id)}   >Add to ShoppingList</Button>
         </CardActionButtons>
       </CardActions>
     </Card >

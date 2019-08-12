@@ -19,7 +19,7 @@ import { Redirect, withRouter } from 'react-router-dom';
 
 
 function CreateRecipe({ recipe, history }) {
-  const emptyIngredient = { ingredient: { name: "", valid: false }, unit: { name: "", valid: false }, amount: { name: "", valid: false } }
+  const emptyIngredient = { ingredient: { name: "", valid: false }, unit: { name: "", valid: true }, amount: { name: "", valid: true } }
   const [RecipeInformation, setRecipeInformation] = useState({});
   const [Ingredients, setIngredients] = useState([]);
   const [CookingSteps, setCookingSteps] = useState([]);
@@ -113,11 +113,12 @@ function CreateRecipe({ recipe, history }) {
 
   function removeIngridient(e) {
     e.preventDefault()
+
     if (Ingredients.length === 1)
-      return setIngredients([{ ingredient: "", unit: "", amount: "" }])
+      return setIngredients([CloneDeep(emptyIngredient)])
 
     const newIngredients = [...Ingredients]
-    newIngredients.splice(e.target.id, 1)
+    newIngredients.splice(e.currentTarget.id, 1)
     setIngredients(newIngredients);
   }
 
@@ -282,7 +283,7 @@ function CreateRecipe({ recipe, history }) {
                             })
                           }
                         </Select>
-                        {<IconButton id={idx} onClick={removeIngridient}><MaterialIcon icon='delete' /></IconButton>}
+                        {<IconButton id={idx} onClick={(e) => removeIngridient(e)}><MaterialIcon icon='delete' /></IconButton>}
                       </div>)
                     })
                   }
@@ -293,7 +294,7 @@ function CreateRecipe({ recipe, history }) {
                   <div className="Steps" style={style.Steps}>{
                     CookingSteps.map((step, idx) => {
                       return (<div key={idx} >
-                        <TextField style={{ width: "100%" }} trailingIcon={<MaterialIcon role="button" icon="delete" />} onTrailingIconSelect={removeCookingStep.bind(idx)} label={"Step " + (idx + 1)} textarea ><Input style={{ resize: "none", width: "100%" }} id={idx} value={step} onChange={updateCookingStep} /></TextField>
+                        <TextField id={idx} style={{ width: "100%" }} trailingIcon={<MaterialIcon role="button" icon="delete" />} onTrailingIconSelect={removeCookingStep.bind(null, idx)} label={"Step " + (idx + 1)} textarea ><Input style={{ resize: "none", width: "100%" }} id={idx} value={step} onChange={updateCookingStep} /></TextField>
                       </div>)
                     }
                     )

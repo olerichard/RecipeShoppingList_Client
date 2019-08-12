@@ -46,7 +46,7 @@ function RecipeOverview({ history }) {
   }
 
   return (
-    <React.Fragment>
+    <div style={{ gridArea: "main" }}>
       <div style={style.CardContainer}>
         {
           Recipes.map((Recipe) => {
@@ -59,7 +59,7 @@ function RecipeOverview({ history }) {
       </div>
       {user.loggedIn ?
         <Fab style={style.Fab} icon={<MaterialIcon icon="add" />} onClick={() => history.push("/recipe/createRecipe")} /> : ""}
-    </React.Fragment>
+    </div>
   );
 }
 

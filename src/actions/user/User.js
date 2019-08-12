@@ -2,7 +2,6 @@ import axios from "axios"
 import decodeJWT from "jwt-decode";
 
 const localStorageKey = "__RecipeShoppingListToken__"
-//const localStorageKey = "RecipeShoppingListToken2"
 
 export async function CreateUser(user) {
 
@@ -22,14 +21,20 @@ export async function LogIn(user) {
   const response = await axios.post('http://localhost:3090/logIn', user)
   console.log(response)
   if (response.data.error != null)
-    return response.data.error
+    return false
 
   localStorage.setItem(localStorageKey, response.data.token);
-  return response.data.user
+  return true
 
 }
 
 export async function LogOut() {
+  const gotUser = localStorage.getItem(localStorageKey)
+
+  console.log("user: " + gotUser)
+
+  if (gotUser === null)
+    return false
 
   localStorage.removeItem(localStorageKey);
   return true

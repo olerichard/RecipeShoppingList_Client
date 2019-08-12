@@ -6,6 +6,7 @@ import './index.css';
 import App from './App';
 
 import Login from './components/user/login/Login';
+import Logout from './components/user/logout/Logout';
 import SignUp from './components/user/signup/SignUp';
 
 import RecipeOverview from './components/recipe/recipeOverview/RecipeOverview';
@@ -16,12 +17,13 @@ import CreateRecipe from './components/recipe/createRecipe/CreateRecipe';
 ReactDOM.render(
 
   <BrowserRouter>
-    <App>
+    <App >
       <Route path="/" exact component={RecipeOverview} />
       <Route path="/recipe/" exact component={ViewRecipe} />
       <Route path="/recipe/edit" exact component={EditRecipe} />
       <Route path="/recipe/createRecipe" exact component={CreateRecipe} />
       <Route path="/login" exact component={Login} />
+      <Route path="/logout" exact component={Logout} />
       <Route path="/signup" exact component={SignUp} />
     </App>
   </BrowserRouter>,
