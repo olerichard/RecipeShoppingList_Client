@@ -6,7 +6,6 @@ const localStorageKey = "__RecipeShoppingListToken__"
 export async function CreateUser(user) {
 
   const response = await axios.post('http://localhost:3090/createUser', user)
-  console.log(user)
   if (response.data.error != null)
     return response.data.error
 
@@ -19,7 +18,6 @@ export async function CreateUser(user) {
 export async function LogIn(user) {
 
   const response = await axios.post('http://localhost:3090/logIn', user)
-  console.log(response)
   if (response.data.error != null)
     return false
 
@@ -30,8 +28,6 @@ export async function LogIn(user) {
 
 export async function LogOut() {
   const gotUser = localStorage.getItem(localStorageKey)
-
-  console.log("user: " + gotUser)
 
   if (gotUser === null)
     return false
@@ -61,9 +57,7 @@ export async function GetUser() {
 }
 
 async function FetchUserInfo(id) {
-  console.log("fetchuser:" + id)
   const response = await axios.post('http://localhost:3090/getUserById', { id })
-  console.log(response)
   return response.data.user;
 }
 

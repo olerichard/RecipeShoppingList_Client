@@ -14,7 +14,7 @@ import IconButton from '@material/react-icon-button';
 import '@material/react-icon-button/dist/icon-button.css';
 import Card, { CardMedia } from "@material/react-card";
 import '@material/react-card/dist/card.css';
-import { useUser } from '../../../context/user-context';
+import { UseUser } from '../../../context/user-context';
 import { Redirect, withRouter } from 'react-router-dom';
 
 
@@ -25,7 +25,7 @@ function CreateRecipe({ recipe, history }) {
   const [CookingSteps, setCookingSteps] = useState([]);
   const [SaveDialog, setSaveDialog] = useState(false);
   const [newRecipe, setNewRecipe] = useState(true);
-  const user = useUser();
+  const user = UseUser();
 
 
   const Units = [
@@ -71,14 +71,14 @@ function CreateRecipe({ recipe, history }) {
       : await SaveEditRecipe(RecipeInformation, Ingredients, CookingSteps);
 
     if (result.id !== undefined)
-      history.push("/Recipe/" + result.id)
+      history.push("/recipe?id=" + result.id)
 
     setSaveDialog(false);
   }
 
   function close() {
     recipe.hasOwnProperty("_id") ?
-      history.push("/Recipe/" + recipe._id) :
+      history.push("/recipe?id=" + recipe._id) :
       history.push("/")
 
   }

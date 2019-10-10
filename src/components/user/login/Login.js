@@ -5,12 +5,14 @@ import Button from '@material/react-button'
 import '@material/react-button/dist/button.css';
 import { Link, Redirect } from 'react-router-dom'
 import { LogIn } from '../../../actions/user/User'
+import { UseUser } from '../../../context/user-context';
 
 export default function Login() {
 
   const [Email, setEmail] = useState({ value: "Test@test.no", valid: true })
   const [Password, setPassword] = useState({ value: "Ab123456", valid: true })
   const [LoggedIn, setLoggedIn] = useState(false)
+  const user = UseUser();
 
   async function onSubmit(e) {
     e.preventDefault()
@@ -22,8 +24,8 @@ export default function Login() {
     if (response === true) {
       console.log("set Logged in true")
       setLoggedIn(true);
+      user.LogIn();
     } else {
-      setEmail({ value: "test@test.no", valid: true })
       setPassword({ value: "", valid: false })
     }
   }

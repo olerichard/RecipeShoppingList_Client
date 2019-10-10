@@ -4,24 +4,19 @@ import StandardRecipeCard from '../recipeCards/StandardRecipeCard';
 import Fab from '@material/react-fab'
 import '@material/react-fab/dist/fab.css';
 import { withRouter } from 'react-router-dom';
-import { useUser } from '../../../context/user-context';
+import { UseUser } from '../../../context/user-context';
 import MaterialIcon from '@material/react-material-icon';
+import { UseShoppingList } from '../../../context/shoppingList-context';
 
 
 function RecipeOverview({ history }) {
   const [Recipes, setRecipes] = useState([]);
-  const user = useUser();
+  const user = UseUser();
+  const shoppingList = UseShoppingList(user).ShoppingList;
 
   useEffect(() => {
-
     const getRecipes = async () => {
-      let arr = []
-      //Just looping this to fill up the app little on load
-      for (let i = 0; i < 20; i++) {
-        const recipes = await GetAllRecipesShortInfo();
-        arr = [...arr, ...recipes]
-      }
-
+      let arr = await GetAllRecipesShortInfo()
       setRecipes([...arr]);
     };
 
@@ -51,7 +46,7 @@ function RecipeOverview({ history }) {
         {
           Recipes.map((Recipe) => {
             return (
-              <StandardRecipeCard key={Recipe._id} recipe={Recipe} />
+              <StandardRecipeCard key={Recipe._id} recipe={Recipe} listId ={shoppingList._id} />
             )
           })
         }

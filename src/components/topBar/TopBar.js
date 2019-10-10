@@ -10,7 +10,7 @@ import TopAppBar, {
 import MaterialIcon from '@material/react-material-icon';
 import '@material/react-top-app-bar/dist/top-app-bar.css';
 import '@material/react-material-icon/dist/material-icon.css';
-import { useUser } from '../../context/user-context';
+import { UseUser } from '../../context/user-context';
 
 const style = {
   List: {
@@ -25,7 +25,7 @@ const style = {
 
 export default function TopBar({ title }) {
 
-  const user = useUser();
+  const user = UseUser().User;
 
   return (
     <div style={{ gridArea: "TopBar" }}>

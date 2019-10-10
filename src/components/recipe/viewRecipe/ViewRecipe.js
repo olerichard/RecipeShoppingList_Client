@@ -6,7 +6,7 @@ import Card, {
 import '@material/react-card/dist/card.css';
 import Button from '@material/react-button'
 import '@material/react-button/dist/button.css';
-import { useUser } from '../../../context/user-context';
+import { UseUser } from '../../../context/user-context';
 import { GetRecipeById } from '../../../actions/Recipe/GetRecipe'
 import { Redirect, Link } from 'react-router-dom';
 import queryString from 'query-string'
@@ -17,9 +17,7 @@ export default function ViewRecipe({ location }) {
   const [isLoading, setIsLoading] = useState(true);
   const [RecipeFound, setRecipeFound] = useState(true);
   const [Picture, setPicture] = useState("");
-  const user = useUser();
-
-
+  const user = UseUser();
 
   useEffect(() => {
     const getRecipe = async (id) => {

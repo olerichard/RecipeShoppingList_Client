@@ -2,6 +2,7 @@ import React from 'react';
 import TopBar from './components/topBar/TopBar';
 import ShoppingList from './components/shoppinglist/ShoppingList'
 import { UserProvider } from './context/user-context'
+import { ShoppingListProvider } from './context/shoppingList-context'
 
 export default ({ children }) => {
 
@@ -17,9 +18,11 @@ export default ({ children }) => {
   return (
     <div style={style.Grid}>
       <UserProvider>
-        <TopBar />
-        <ShoppingList />
-        {children}
+        <ShoppingListProvider>
+          <TopBar />
+          <ShoppingList />
+          {children}  
+        </ShoppingListProvider>
       </UserProvider>
     </div>
   )

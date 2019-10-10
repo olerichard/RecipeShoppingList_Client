@@ -1,33 +1,34 @@
-import React, { useState, useEffect } from 'react'
-import { GetShoppingList } from '../../actions/user/ShoppingList'
+import React  from 'react'
 import StandardRecipeCard from '../recipe/recipeCards/StandardRecipeCard';
-import { useUser } from '../../context/user-context';
-import { useShoppingList } from '../../context/currentShoppingList';
+import { UseShoppingList } from '../../context/shoppingList-context';
 
-function ShoppingList() {
+export function ShoppingList() {
   const style = {
     main: {
       gridArea: "shoppinglist",
-      backgroundColor: "red",
       width: "100%",
       height: "2000px"
     }
   }
 
-  const [ListItems, setListItems] = useState([]);
-  const user = useUser();
-  const ShoppingList = useShoppingList(user)
+  const shoppingList = UseShoppingList().ShoppingList;
+  const renderList = (shoppingList.recipes === undefined || shoppingList.recipes === "" || shoppingList.recipes.length <= 0) ? false:true;
+  console.log("RenderList:" + renderList)
 
   return (
+    <React.Fragment>
+    {renderList ?
     <div style={style.main} >
       {
-        ListItems.map((item) => {
+        shoppingList.recipes.map((item) => {
           return (
-            <StandardRecipeCard key={item._id} recipe={item} />
+            <StandardRecipeCard key={item._id} recipe={item} listId={shoppingList._id} />
           )
         })
       }
-    </ div>
+    </ div> : null
+    }
+    </React.Fragment>
   )
 }
 

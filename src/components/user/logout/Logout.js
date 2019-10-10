@@ -1,17 +1,19 @@
 import React, { useEffect } from 'react';
 import { Redirect } from 'react-router-dom'
 import { LogOut } from '../../../actions/user/User'
+import { UseUser } from '../../../context/user-context';
 
 export default function Logout() {
+  const user = UseUser();
 
   useEffect(() => {
-
     LogOut()
-    return window.location.reload()
+    user.LogOut();
   }, [])
 
-
   return (
-    <div><Redirect to="/" /></div>
+    <React.Fragment>
+      <Redirect to="/" />
+    </React.Fragment>
   )
 }

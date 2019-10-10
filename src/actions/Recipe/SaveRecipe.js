@@ -1,6 +1,6 @@
 import axios from "axios"
 
-export async function SaveNewRecipe({ name, file }, ingredients, cookingSteps) {
+export async function SaveNewRecipe( name, file , ingredients, cookingSteps) {
   const recipeData = new FormData();
   recipeData.append("image", file);
   recipeData.append("name", name);
