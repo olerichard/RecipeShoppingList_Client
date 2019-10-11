@@ -25,7 +25,7 @@ function CreateRecipe({ recipe, history }) {
   const [CookingSteps, setCookingSteps] = useState([]);
   const [SaveDialog, setSaveDialog] = useState(false);
   const [newRecipe, setNewRecipe] = useState(true);
-  const user = UseUser();
+  const user = UseUser().User;
 
 
   const Units = [
@@ -196,7 +196,8 @@ function CreateRecipe({ recipe, history }) {
       display: "grid",
       gridRowGap: "0.5em",
       gridTemplateColumns: "minmax(25%, 50em)",
-      justifyContent: "center"
+      justifyContent: "center",
+      gridArea: "main" ,
     },
     Ingredients: {
       display: "grid",

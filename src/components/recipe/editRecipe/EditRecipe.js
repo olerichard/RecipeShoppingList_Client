@@ -32,6 +32,7 @@ export default function EditRecipe({ location }) {
 
   const style = {
     Recipe: {
+      gridArea: "main" ,
     }
   }
   return (

@@ -11,6 +11,7 @@ import MaterialIcon from '@material/react-material-icon';
 import '@material/react-top-app-bar/dist/top-app-bar.css';
 import '@material/react-material-icon/dist/material-icon.css';
 import { UseUser } from '../../context/user-context';
+import { withRouter } from 'react-router-dom';
 
 const style = {
   List: {
@@ -23,7 +24,7 @@ const style = {
   }
 };
 
-export default function TopBar({ title }) {
+function TopBar({ title,history }) {
 
   const user = UseUser().User;
 
@@ -33,7 +34,7 @@ export default function TopBar({ title }) {
         <TopAppBarRow>
           <TopAppBarSection align='start'>
             <TopAppBarIcon navIcon tabIndex={0}>
-              <MaterialIcon hasRipple icon='menu' onClick={() => console.log('click')} />
+              <MaterialIcon hasRipple icon='menu' onClick={() => history.push("/")}  />
             </TopAppBarIcon>
             <TopAppBarTitle>{title}</TopAppBarTitle>
           </TopAppBarSection>
@@ -46,7 +47,6 @@ export default function TopBar({ title }) {
                 </React.Fragment>
                 : <li><Link style={style.Link} to="/login">Log In</Link></li>
               }
-
             </ul>
           </TopAppBarSection>
         </TopAppBarRow>
@@ -56,3 +56,5 @@ export default function TopBar({ title }) {
     </div>
   );
 }
+
+export default withRouter(TopBar);

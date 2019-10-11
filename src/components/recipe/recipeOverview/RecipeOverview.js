@@ -11,7 +11,7 @@ import { UseShoppingList } from '../../../context/shoppingList-context';
 
 function RecipeOverview({ history }) {
   const [Recipes, setRecipes] = useState([]);
-  const user = UseUser();
+  const user = UseUser().User;
   const shoppingList = UseShoppingList(user).ShoppingList;
 
   useEffect(() => {
@@ -53,7 +53,7 @@ function RecipeOverview({ history }) {
 
       </div>
       {user.loggedIn ?
-        <Fab style={style.Fab} icon={<MaterialIcon icon="add" />} onClick={() => history.push("/recipe/createRecipe")} /> : ""}
+        <Fab style={style.Fab} icon={<MaterialIcon icon="add" />} onClick={() => history.push("/recipe/createRecipe")} /> : null}
     </div>
   );
 }

@@ -17,7 +17,7 @@ export default function ViewRecipe({ location }) {
   const [isLoading, setIsLoading] = useState(true);
   const [RecipeFound, setRecipeFound] = useState(true);
   const [Picture, setPicture] = useState("");
-  const user = UseUser();
+  const user = UseUser().User;
 
   useEffect(() => {
     const getRecipe = async (id) => {
@@ -48,6 +48,7 @@ export default function ViewRecipe({ location }) {
 
   const style = {
     ViewRecipe: {
+      gridArea: "main" ,
       margin: "1em",
       display: "grid",
       gridRowGap: "0.5em",

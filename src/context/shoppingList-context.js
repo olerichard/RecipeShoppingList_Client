@@ -6,12 +6,12 @@ const ShoppingListContext = createContext()
 
 export  function ShoppingListProvider({ children }) {
   const [ShoppingList, SetShoppingList] = useState("")
-  const user = UseUser()
+  const user = UseUser().User
   const state = {ShoppingList,UpdateShoppingList};
 
   function UpdateShoppingList(){
     const awaitShoppingList = async () => {
-      const fetchedShoppingList = await GetShoppingList(user.User._id);
+      const fetchedShoppingList = await GetShoppingList(user._id);
       SetShoppingList({ ...fetchedShoppingList });
     };
     awaitShoppingList();
@@ -19,7 +19,7 @@ export  function ShoppingListProvider({ children }) {
 
   useEffect(() => {
     const awaitShoppingList = async () => {
-      const fetchedShoppingList = await GetShoppingList(user.User._id);
+      const fetchedShoppingList = await GetShoppingList(user._id);
       SetShoppingList({ ...fetchedShoppingList });
     };
     
