@@ -10,6 +10,8 @@ import '@material/react-tab-scroller/dist/tab-scroller.css';
 import '@material/react-tab/dist/tab.css';
 import '@material/react-tab-indicator/dist/tab-indicator.css';
 
+import {useSpring,animated} from 'react-spring'
+
  export default function ShoppingList() {
   
   const shoppingList = UseShoppingList().ShoppingList;
@@ -17,6 +19,21 @@ import '@material/react-tab-indicator/dist/tab-indicator.css';
   const renderList = (settings.showList && shoppingList.recipes !== undefined && shoppingList.recipes !== null && shoppingList.recipes !== "" && shoppingList.recipes.length > 0 );
   
   const [ActiveIndex,SetActiveIndex] = useState(settings.showRecipes ? 0:1);
+
+  const animateList = useSpring({
+    from:{
+      opacity: 0, 
+      
+    },
+    to:{
+      opacity: 1, 
+      
+    },
+    config:{
+      duration: 500
+    }
+  })
+
 
   const style = {
     ShoppingList: {
@@ -34,6 +51,7 @@ import '@material/react-tab-indicator/dist/tab-indicator.css';
     <React.Fragment>{
       renderList ?(
         <div style={style.ShoppingList} >  
+        <animated.div style={animateList}>
           <TabBar  activeIndex={ActiveIndex} handleActiveIndexUpdate={(activeIndex => SetActiveIndex(activeIndex))}>
             <Tab><span className='mdc-tab__text-label'>Recipes</span></Tab>
             <Tab><span className='mdc-tab__text-label'>Ingredients</span></Tab>
@@ -47,6 +65,7 @@ import '@material/react-tab-indicator/dist/tab-indicator.css';
               )
             }) : <ShoppingListIngredients recipes={shoppingList.recipes}/>
           }
+        </animated.div>
         </ div>
       ) 
       : null

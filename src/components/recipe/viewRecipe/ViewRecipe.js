@@ -10,6 +10,7 @@ import { UseUser } from '../../../context/user-context';
 import { GetRecipeById } from '../../../actions/Recipe/GetRecipe'
 import { Redirect, Link } from 'react-router-dom';
 import queryString from 'query-string'
+import {useSpring,animated} from 'react-spring'
 
 
 export default function ViewRecipe({ location }) {
@@ -44,7 +45,17 @@ export default function ViewRecipe({ location }) {
 
   }, [])
 
-
+  const animateViewRecipe = useSpring({
+    from:{
+      opacity: 0, 
+    },
+    to:{
+      opacity: 1, 
+    },
+    config:{
+      duration: 1000
+    }
+  })
 
   const style = {
     ViewRecipe: {
@@ -111,6 +122,7 @@ export default function ViewRecipe({ location }) {
     <React.Fragment>
       {isLoading ? (<div>"loading"</div>) : (
         RecipeFound ?
+        <animated.div style={animateViewRecipe}>
           <div style={style.ViewRecipe}>
             <div>
             <Card style={style.Card}>
@@ -140,7 +152,7 @@ export default function ViewRecipe({ location }) {
               </div>
             </Card>
             </div>
-          </div>
+          </div></animated.div>
           : <Redirect to="/" />
       )}
     </React.Fragment>);

@@ -7,6 +7,7 @@ import { withRouter } from 'react-router-dom';
 import { UseUser } from '../../../context/user-context';
 import MaterialIcon from '@material/react-material-icon';
 import { UseShoppingList } from '../../../context/shoppingList-context';
+import {useTrail,animated} from 'react-spring'
 
 
 function RecipeOverview({ history }) {
@@ -19,7 +20,6 @@ function RecipeOverview({ history }) {
       let arr = await GetAllRecipesShortInfo()
       setRecipes([...arr]);
     };
-
     getRecipes();
   }, [])
 
@@ -41,17 +41,24 @@ function RecipeOverview({ history }) {
     }
   }
 
+  const animateOverview = useTrail(Recipes.length,{
+    opacity: 1,
+    transform: 'translate3d(0,0,0)',
+    from: { opacity: 0 ,transform: 'translate3d(0,-70px,0)' },
+    config : { duration:500 }
+  });
+
   return (
     <div>
-      <div style={style.CardContainer}>
-        {
-          Recipes.map((Recipe) => {
-            return (
-              <StandardRecipeCard key={Recipe._id} recipe={Recipe} listId ={shoppingList._id} />
-            )
-          })
-        }
+      <div style={style.CardContainer}> 
 
+          {animateOverview.map((props,i) => {
+            return(
+              <animated.div key={Recipes[i]._id} style={props}>
+               <div> <StandardRecipeCard key={Recipes[i]._id} recipe={Recipes[i]} listId ={shoppingList._id} /></div>
+              </animated.div>
+            )
+          })}
       </div>
       {user.loggedIn ?
         <Fab style={style.Fab} icon={<MaterialIcon icon="add" />} onClick={() => history.push("/recipe/createRecipe")} /> : null}
