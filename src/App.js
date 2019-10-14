@@ -8,34 +8,25 @@ import { SettingsProvider } from './context/settings-context'
 export default ({ children }) => {
 
   const style = {
-    OverViewWithShoppingList: {
-      display: "Grid",
-      gridTemplateAreas: `
-        'TopBar TopBar'
-        'main   shoppinglist'`,
-      gridTemplateColumns: "4fr 1fr"
-    },
-    OverViewNoShoppingList: {
-      display: "Grid",
-      gridTemplateAreas: `
-        'TopBar'
-        'main '`,
-      gridTemplateColumns: "1fr"
-    },
+    recipes:{
+      display:"Grid",
+      gridTemplateColumns: "3fr auto",
+    }
   }
 
   return (
-    <div style={style.OverViewWithShoppingList}>
       <UserProvider>
         <ShoppingListProvider>
           <SettingsProvider>
             <TopBar />
-            <ShoppingList />
-            {children}  
+            <div style={style.recipes}>
+              {children}  
+              <ShoppingList />
+            </div>
           </SettingsProvider>
         </ShoppingListProvider>
       </UserProvider>
-    </div>
+    
   )
 }
 

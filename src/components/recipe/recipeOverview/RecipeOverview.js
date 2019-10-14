@@ -37,11 +37,12 @@ function RecipeOverview({ history }) {
       bottom: "2em",
       width: "5em",
       height: "5em",
+      zIndex: "10",
     }
   }
 
   return (
-    <div style={{ gridArea: "main" }}>
+    <div>
       <div style={style.CardContainer}>
         {
           Recipes.map((Recipe) => {

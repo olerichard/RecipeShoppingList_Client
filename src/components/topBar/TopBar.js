@@ -29,7 +29,7 @@ function TopBar({ title,history }) {
   const user = UseUser().User;
 
   return (
-    <div style={{ gridArea: "TopBar" }}>
+    <div>
       <TopAppBar>
         <TopAppBarRow>
           <TopAppBarSection align='start'>

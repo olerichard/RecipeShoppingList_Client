@@ -15,7 +15,6 @@ import ViewRecipe from './components/recipe/viewRecipe/ViewRecipe';
 import CreateRecipe from './components/recipe/createRecipe/CreateRecipe';
 
 ReactDOM.render(
-
   <BrowserRouter>
     <App >
       <Route path="/" exact component={RecipeOverview} />

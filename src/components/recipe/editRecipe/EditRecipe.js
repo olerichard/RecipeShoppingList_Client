@@ -30,14 +30,9 @@ export default function EditRecipe({ location }) {
     }
   }, [])
 
-  const style = {
-    Recipe: {
-      gridArea: "main" ,
-    }
-  }
   return (
-    <div style={style.Recipe}>
+    <React.Fragment>
       {isLoading ? (<div>LOADING</div>) : (RecipeFound ? (<CreateRecipe recipe={Recipe} />) : <Redirect to="/" />)}
-    </div>
+      </React.Fragment>
   );
 }

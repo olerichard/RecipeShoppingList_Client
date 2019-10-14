@@ -197,7 +197,6 @@ function CreateRecipe({ recipe, history }) {
       gridRowGap: "0.5em",
       gridTemplateColumns: "minmax(25%, 50em)",
       justifyContent: "center",
-      gridArea: "main" ,
     },
     Ingredients: {
       display: "grid",
@@ -257,6 +256,7 @@ function CreateRecipe({ recipe, history }) {
     <React.Fragment>
       {user.loggedIn ?
         (<div style={style.FormCard}>
+          <div>
           <Card style={style.Card}>
             <CardMedia style={style.GridBottom} wide imageUrl={getPicture()}>
               <Input style={style.PictureInput} type="file" name="file" id="file" accept="image/gif,image/png,image/jpeg" onChange={(e) => handleImageChange(e)} />
@@ -318,10 +318,9 @@ function CreateRecipe({ recipe, history }) {
               </form >
             </div>
           </Card>
+          </div>
         </div >) : (<Redirect to="/" />)}
     </React.Fragment>);
 }
-
-
 
 export default withRouter(CreateRecipe);

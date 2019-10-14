@@ -48,7 +48,6 @@ export default function ViewRecipe({ location }) {
 
   const style = {
     ViewRecipe: {
-      gridArea: "main" ,
       margin: "1em",
       display: "grid",
       gridRowGap: "0.5em",
@@ -113,6 +112,7 @@ export default function ViewRecipe({ location }) {
       {isLoading ? (<div>"loading"</div>) : (
         RecipeFound ?
           <div style={style.ViewRecipe}>
+            <div>
             <Card style={style.Card}>
               <CardMedia style={style.Picture} wide imageUrl={`data:${Recipe.picture.contentType};base64,${Picture}`}><div style={style.Name}><h1 style={style.NameText}>{Recipe.name}</h1></div></CardMedia>
               <div style={style.Content}>
@@ -139,6 +139,7 @@ export default function ViewRecipe({ location }) {
 
               </div>
             </Card>
+            </div>
           </div>
           : <Redirect to="/" />
       )}

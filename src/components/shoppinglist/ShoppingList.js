@@ -12,27 +12,15 @@ import '@material/react-tab-indicator/dist/tab-indicator.css';
 
  export default function ShoppingList() {
   
-  
-  
   const shoppingList = UseShoppingList().ShoppingList;
   const settings = UseSettings().Settings.ShoppingList;
-  const renderList = (settings.showList && shoppingList.recipes !== undefined && shoppingList.recipes !== null && shoppingList.recipes !== "");
+  const renderList = (settings.showList && shoppingList.recipes !== undefined && shoppingList.recipes !== null && shoppingList.recipes !== "" && shoppingList.recipes.length > 0 );
   
   const [ActiveIndex,SetActiveIndex] = useState(settings.showRecipes ? 0:1);
 
   const style = {
     ShoppingList: {
-      width: "90%",
-      gridArea: "shoppinglist",
-      gridTemplateColumns: "repeat(auto-fill, minmax(15em, 1fr))",
-      gridTemplateRows: "minmax(0,  min-content)",
-      margin: "1em",
-      display: "grid",
-      rowGap: "1em"
-    },
-    ShoppingListFlex: {
       width: "100%",
-      gridArea: "shoppinglist",
       display: "flex",
       flexDirection:"column",
     },
@@ -45,7 +33,7 @@ import '@material/react-tab-indicator/dist/tab-indicator.css';
   return (
     <React.Fragment>{
       renderList ?(
-        <div style={style.ShoppingListFlex} >  
+        <div style={style.ShoppingList} >  
           <TabBar  activeIndex={ActiveIndex} handleActiveIndexUpdate={(activeIndex => SetActiveIndex(activeIndex))}>
             <Tab><span className='mdc-tab__text-label'>Recipes</span></Tab>
             <Tab><span className='mdc-tab__text-label'>Ingredients</span></Tab>
