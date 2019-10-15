@@ -24,11 +24,7 @@ export default function StandardRecipeCard({ recipe, listId }) {
   }
   const shoppingListContext = UseShoppingList();
   const shoppingList = shoppingListContext.ShoppingList;
-  const showAddToShoppingList = (listId === undefined || listId === "" || shoppingList === undefined || shoppingList === "No User" || shoppingList.recipes.some(r=> r._id === recipe._id)) ? false : true;
-  const shoppingListExistsButEmpty = shoppingList._id !== undefined && shoppingList.recipes.length === 0
-  console.log("ShoppingList empty:" + shoppingListExistsButEmpty)
-  console.log("ShoppingList Show:" + showAddToShoppingList)
-
+  const showAddToShoppingList = (listId === undefined || listId === "" || shoppingList === undefined || shoppingList === "No User" || shoppingList.recipes.some(r=> r._id === recipe._id)) ? false : true;  
 
   async function  addToShoppingList(list,id){
     await AddToShoppingList(list,id);

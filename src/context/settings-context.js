@@ -25,7 +25,7 @@ export function UseSettings() {
 }
 
 function DefaultSettings(user){
-    // If user get localstorage else return default.
+    //TODO: If user get localstorage else return default.
     return {
         ShoppingList:{
             showList: true,

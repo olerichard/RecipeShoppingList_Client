@@ -51,7 +51,6 @@ function RecipeOverview({ history }) {
   return (
     <div>
       <div style={style.CardContainer}> 
-
           {animateOverview.map((props,i) => {
             return(
               <animated.div key={Recipes[i]._id} style={props}>
@@ -59,9 +58,9 @@ function RecipeOverview({ history }) {
               </animated.div>
             )
           })}
-      </div>
-      {user.loggedIn ?
-        <Fab style={style.Fab} icon={<MaterialIcon icon="add" />} onClick={() => history.push("/recipe/createRecipe")} /> : null}
+    </div>
+    {user.loggedIn ?
+      <Fab style={style.Fab} icon={<MaterialIcon icon="add" />} onClick={() => history.push("/recipe/createRecipe")} /> : null}
     </div>
   );
 }

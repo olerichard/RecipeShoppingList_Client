@@ -14,6 +14,12 @@ export function ReduceShoppingListToIngredients(recipes){
 
     let ingredientsList = {};
     recipes.recipes.forEach(recipe => { ingredientsList = breakDownRecipesToIngredients(ingredientsList,recipe)})
-    return ingredientsList
+    const ingredientsListToArray = [] 
+    
+    for (let ing in ingredientsList){
+        ingredientsListToArray.push(ingredientsList[ing])
+    };
+    
+    return ingredientsListToArray
 
 }
