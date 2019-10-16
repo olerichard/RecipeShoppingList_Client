@@ -10,7 +10,7 @@ import {useTrail,animated} from 'react-spring'
   const animateList= useTrail(recipes.length,{
     opacity: 1,
     transform: 'translate3d(0,0,0)',
-    from: { opacity: 0 ,transform: 'translate3d(0,-70px,0)' },
+    from: { opacity: 0 ,transform: 'translate3d(0,0px,0)' },
     config : { duration:500 }
   });
 

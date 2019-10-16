@@ -26,7 +26,6 @@ export default ({ children }) => {
           </SettingsProvider>
         </ShoppingListProvider>
       </UserProvider>
-    
   )
 }
 

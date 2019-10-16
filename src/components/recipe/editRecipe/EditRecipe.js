@@ -28,7 +28,7 @@ export default function EditRecipe({ location }) {
     } else {
       getRecipe(values.id);
     }
-  }, [])
+  }, [location])
 
   return (
     <React.Fragment>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import CloneDeep from 'lodash/cloneDeep'
-import { SaveNewRecipe, SaveEditRecipe } from '../../../actions/Recipe/SaveRecipe'
+import { SaveNewRecipe, SaveEditRecipe } from '../../../actions/Recipe/SaveRecipe';
+import {GetUnitAll} from '../../../actions/Recipe/GetUnit';
 import TextField, { Input } from '@material/react-text-field';
 import '@material/react-text-field/dist/text-field.css';
 import Button from '@material/react-button'
@@ -19,48 +20,40 @@ import { Redirect, withRouter } from 'react-router-dom';
 
 
 function CreateRecipe({ recipe, history }) {
-  const emptyIngredient = { ingredient: { name: "", valid: false }, unit: { name: "", valid: true }, amount: { name: "", valid: true } }
-  const [RecipeInformation, setRecipeInformation] = useState({});
-  const [Ingredients, setIngredients] = useState([]);
+  const emptyIngredient = { ingredient: { name: "", valid: false }, unit: { name: {}, valid: false }, amount: { name: "", valid: false } }
+  const [RecipeInformation, setRecipeInformation] = useState({ name: '', valid: true });
+  const [Ingredients, setIngredients] = useState([CloneDeep(emptyIngredient)]);
   const [CookingSteps, setCookingSteps] = useState([]);
   const [SaveDialog, setSaveDialog] = useState(false);
   const [newRecipe, setNewRecipe] = useState(true);
+  const [units,setUnits] = useState([])
   const user = UseUser().User;
-
-
-  const Units = [
-    { unit: null, name: null },
-    { unit: "KG", name: "Kilo" },
-    { unit: "L", name: "Liter" },
-    { unit: "DL", name: "DL" },
-    { unit: "ML", name: "ML" },
-    { unit: "GR", name: "Gram" },
-    { unit: "PCS", name: "Pieces" }
-  ]
-
+  
   useEffect(() => {
     if (recipe !== undefined && recipe.hasOwnProperty("_id")) {
       setRecipeInformation({ _id: recipe._id, name: recipe.name, tags: recipe.tags, valid: true, picture: { ...recipe.picture, use: true } });
       setIngredients(MapIngredients(recipe.ingredients));
       setCookingSteps([...recipe.cookingSteps]);
       setNewRecipe(false);
-    } else {
-      setRecipeInformation({ name: '', valid: false })
-      setIngredients([CloneDeep(emptyIngredient)])
-      setCookingSteps([""])
     }
+  }, [recipe])
+
+  useEffect(() => {
+    const getUnits = async () => {
+      let arr = await GetUnitAll()
+      setUnits([{unit:"",name:""},...arr]);
+    };
+    getUnits();
   }, [])
 
   function MapIngredients(ingredients) {
     return ingredients.map((i) => {
-      const newIngredient = CloneDeep(emptyIngredient);
-      newIngredient.ingredient = { name: i.name, valid: true }
-      newIngredient.amount = { name: i.amount, valid: true }
-      newIngredient.unit = { name: i.unit, valid: true }
-      return newIngredient
+      return {
+        ingredient : { name: i.name, valid: true },
+        amount : { name: i.amount, valid: true },
+        unit : { name: {...i.unit}, valid: true }
+      }
     })
-
-
   }
 
   async function submitRecipe(action) {
@@ -80,34 +73,44 @@ function CreateRecipe({ recipe, history }) {
     recipe.hasOwnProperty("_id") ?
       history.push("/recipe?id=" + recipe._id) :
       history.push("/")
-
   }
 
   function isRecipeValid() {
-
-    const RecipyNameValid = RecipeInformation.valid
+    const RecipyNameValid = RecipeInformation.valid && RecipeInformation.name !== ""
     const IngredientsValid = Ingredients.filter((i) => i.ingredient.valid && i.unit.valid && i.amount.valid).length === Ingredients.length
     const CookingStepsValid = CookingSteps.filter((s) => s.length >= 1).length === CookingSteps.length
 
     return RecipyNameValid && IngredientsValid && CookingStepsValid
   }
 
-
   function addEmptyIngredient(e) {
     e.preventDefault()
     return setIngredients([...Ingredients, CloneDeep(emptyIngredient)])
   }
 
-  function updateIngedient(e) {
+  function updateIngredient(e) {
     e.preventDefault()
     const newIngredients = [...Ingredients];
     const [field, id] = e.target.id.split('-');
+    let value = e.target.value;
+    let valid = false
 
-    if (field === "amount" && e.target.value < 0)
-      e.target.value = 0
+    if (field === "amount" ){
+      value = value < 0 ? 0 : value;
+      valid = value > 0 
+    }
 
-    newIngredients[id][field].name = e.target.value;
-    newIngredients[id][field].valid = e.target.value.length >= 1
+    if(field === "unit"){
+      value = units.find((u) => u.unit === value )
+      valid = value !== undefined && value.unit !== ""
+    }
+
+    if(field === "ingredient"){
+      valid = value.length >= 1
+    }
+
+    newIngredients[id][field].name = value;
+    newIngredients[id][field].valid = valid
     setIngredients(newIngredients);
   }
 
@@ -135,7 +138,6 @@ function CreateRecipe({ recipe, history }) {
   }
 
   function removeCookingStep(e) {
-
     if (CookingSteps.length === 1)
       return setCookingSteps([""])
 
@@ -152,8 +154,8 @@ function CreateRecipe({ recipe, history }) {
   function handleImageChange(e) {
     e.preventDefault();
 
-    let reader = new FileReader();
-    let file = e.target.files[0];
+    const reader = new FileReader();
+    const file = e.target.files[0];
 
     reader.onloadend = () => {
       setRecipeInformation({
@@ -174,7 +176,8 @@ function CreateRecipe({ recipe, history }) {
   function getPicture() {
     if (RecipeInformation.picture !== undefined && RecipeInformation.picture.use) {
       return `data:${RecipeInformation.picture.contentType};base64,${new Buffer(RecipeInformation.picture.data.data).toString('base64')}`;
-    } else if (RecipeInformation.pictureLocal !== undefined && RecipeInformation.pictureLocal.use) {
+    } 
+    else if (RecipeInformation.pictureLocal !== undefined && RecipeInformation.pictureLocal.use) {
       return RecipeInformation.pictureLocal.picture;
     }
 
@@ -247,10 +250,8 @@ function CreateRecipe({ recipe, history }) {
       display: "flex",
       alignItems: "flex-end",
       justifyContent: "flex-end",
-
     }
   }
-
 
   return (
     <React.Fragment>
@@ -273,11 +274,11 @@ function CreateRecipe({ recipe, history }) {
                   {
                     Ingredients.map((ing, idx) => {
                       return (<div style={style.IngredientRow} key={idx}>
-                        <TextField id={"textField-ingredient-" + idx} trailingIcon={null}><Input isValid={ing.ingredient.valid} id={"ingredient-" + idx} value={ing.ingredient.name} onChange={updateIngedient} /></TextField>
-                        <TextField ><Input isValid={ing.amount.valid} type="number" id={"amount-" + idx} value={ing.amount.name} onChange={updateIngedient} /></TextField>
-                        <Select id={"unit-" + idx} value={ing.unit.name} onChange={updateIngedient}>
+                        <TextField id={"textField-ingredient-" + idx} trailingIcon={null}><Input isValid={ing.ingredient.valid} id={"ingredient-" + idx} value={ing.ingredient.name} onChange={updateIngredient} /></TextField>
+                        <TextField ><Input isValid={ing.amount.valid} type="number" id={"amount-" + idx} value={ing.amount.name} onChange={updateIngredient} /></TextField>
+                        <Select id={"unit-" + idx} value={ing.unit.name.unit} onChange={updateIngredient}>
                           {
-                            Units.map((unit) => {
+                            units.map((unit) => {
                               return (
                                 <Option key={unit.unit} value={unit.unit}>{unit.name}</Option>
                               )

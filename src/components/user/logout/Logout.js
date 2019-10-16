@@ -9,7 +9,7 @@ export default function Logout() {
   useEffect(() => {
     LogOut()
     user.LogOut();
-  }, [])
+  }, [user])
 
   return (
     <React.Fragment>

@@ -43,7 +43,7 @@ export default function ViewRecipe({ location }) {
       getRecipe(values.id);
     }
 
-  }, [])
+  },[location])
 
   const animateViewRecipe = useSpring({
     from:{
@@ -132,7 +132,7 @@ export default function ViewRecipe({ location }) {
                   {Recipe.ingredients.map((ing, idx) => {
                     return (
                       <ul style={style.IngredientRow} key={`ing${idx}`}>
-                        <li> {ing.amount} {ing.unit} off {ing.name}</li>
+                        <li> {ing.amount} {ing.unit.name} off {ing.name}</li>
                       </ul>
                     )
                   })}
