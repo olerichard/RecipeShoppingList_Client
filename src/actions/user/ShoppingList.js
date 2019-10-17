@@ -1,30 +1,32 @@
-import axios from "axios"
+import {Post} from "../../api/api"
 
 export async function GetShoppingList(user) {
-  const response = await axios.post('http://localhost:3090/getShoppingList', {user})
-  
+  const response = await Post('getShoppingList', {user})
+
   if (response.data.error != null)
     return response.data.error
-    
-  return response.data.shoppingList
+  
+  return response.data.success
 
 }
 
 export async function AddToShoppingList(listId, itemId) {
-  const response = await axios.post('http://localhost:3090/addToShoppingList', { listId, itemId })
+  const response =  await Post('addToShoppingList', { listId, itemId })
 
   if (response.data.error != null)
     return response.data.error
+  
+  return response.data.success
 
-  return response.data.shoppingList
 }
 
 export async function RemoveFromShoppingList(listId, itemId) {
-  const response = await axios.post('http://localhost:3090/removeFromShoppingList', { listId, itemId })
+  const response = await Post('removeFromShoppingList', { listId, itemId })
 
   if (response.data.error != null)
     return response.data.error
+  
+  return response.data.success
 
-  return response.data.shoppingList
 }
 

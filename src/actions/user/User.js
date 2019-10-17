@@ -1,11 +1,10 @@
-import axios from "axios"
-import decodeJWT from "jwt-decode";
+import {Get,Post} from "../../api/api"
 
 const localStorageKey = "__RecipeShoppingListToken__"
 
 export async function CreateUser(user) {
 
-  const response = await axios.post('http://localhost:3090/createUser', user)
+  const response = await Post("createUser",user)
   if (response.data.error != null)
     return response.data.error
 
@@ -16,8 +15,7 @@ export async function CreateUser(user) {
 }
 
 export async function LogIn(user) {
-
-  const response = await axios.post('http://localhost:3090/logIn', user)
+  const response = await Post("logIn",user)
   if (response.data.error != null)
     return false
 
@@ -37,30 +35,17 @@ export async function LogOut() {
 }
 
 export async function GetUser() {
-  const token = GetToken();
+  const token = localStorage.getItem(localStorageKey);
 
   if (token === null)
     return { loggedIn: false };
 
-  const decoded = decodeJWT(token);
+  const response = await Get("getUserById");
+  console.log(response)
 
-  if (decoded.sub === undefined)
+  if (response.data.error)
     return { loggedIn: false }
 
-  var user = await FetchUserInfo(decoded.sub)
-  if (user === null)
-    return { loggedIn: false }
+  return {...response.data.user,loggedIn : true}
 
-  user.loggedIn = true
-
-  return user
-}
-
-async function FetchUserInfo(id) {
-  const response = await axios.post('http://localhost:3090/getUserById', { id })
-  return response.data.user;
-}
-
-export function GetToken() {
-  return localStorage.getItem(localStorageKey)
 }

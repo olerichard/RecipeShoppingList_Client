@@ -1,23 +1,31 @@
-import axios from "axios"
+import {Get} from "../../api/api"
 
 export async function GetRecipeAll() {
+  const response =  await Get('getAllRecipes')
 
-  const response = await axios.get('http://localhost:3090/getAllRecipes')
+  if (response.data.error != null)
+    return response.data.error
+
   return response.data.success
+
 
 }
 
 export async function GetAllRecipesShortInfo() {
+  const response =  await Get("getAllRecipesShortInfo")
 
-  const response = await axios.get('http://localhost:3090/getAllRecipesShortInfo')
+  if (response.data.error != null)
+    return response.data.error
+
   return response.data.success
-
 }
 
 
 export async function GetRecipeById(id) {
+  const response =  await Get("getRecipeById",id)
 
-  const response = await axios.get('http://localhost:3090/getRecipeById?id=' + id)
-  console.log(response.data)
+  if (response.data.error != null)
+    return response.data.error
+
   return response.data.success
 }

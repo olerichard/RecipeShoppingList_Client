@@ -17,6 +17,12 @@ import Card, { CardMedia } from "@material/react-card";
 import '@material/react-card/dist/card.css';
 import { UseUser } from '../../../context/user-context';
 import { Redirect, withRouter } from 'react-router-dom';
+import {useSpring,animated} from 'react-spring'
+import {standardSpringFadeIn} from '../../../animations/animations'
+import {ChipSet, Chip} from '@material/react-chips';
+import "@material/react-chips/dist/chips.css";
+
+
 
 
 function CreateRecipe({ recipe, history }) {
@@ -24,6 +30,8 @@ function CreateRecipe({ recipe, history }) {
   const [RecipeInformation, setRecipeInformation] = useState({ name: '', valid: true });
   const [Ingredients, setIngredients] = useState([CloneDeep(emptyIngredient)]);
   const [CookingSteps, setCookingSteps] = useState([]);
+  const [Tags,setTags] = useState([])
+  const [Tag,setTag] = useState("");
   const [SaveDialog, setSaveDialog] = useState(false);
   const [newRecipe, setNewRecipe] = useState(true);
   const [units,setUnits] = useState([])
@@ -34,6 +42,7 @@ function CreateRecipe({ recipe, history }) {
       setRecipeInformation({ _id: recipe._id, name: recipe.name, tags: recipe.tags, valid: true, picture: { ...recipe.picture, use: true } });
       setIngredients(MapIngredients(recipe.ingredients));
       setCookingSteps([...recipe.cookingSteps]);
+      setTags([...recipe.tags])
       setNewRecipe(false);
     }
   }, [recipe])
@@ -60,8 +69,8 @@ function CreateRecipe({ recipe, history }) {
     if (action === "dismiss") return setSaveDialog(false)
 
     const result = newRecipe
-      ? await SaveNewRecipe(RecipeInformation.name, RecipeInformation.pictureLocal.file, Ingredients, CookingSteps)
-      : await SaveEditRecipe(RecipeInformation, Ingredients, CookingSteps);
+      ? await SaveNewRecipe(RecipeInformation.name, RecipeInformation.pictureLocal.file, Ingredients, CookingSteps,Tags)
+      : await SaveEditRecipe(RecipeInformation, Ingredients, CookingSteps,Tags);
 
     if (result.id !== undefined)
       history.push("/recipe?id=" + result.id)
@@ -144,6 +153,32 @@ function CreateRecipe({ recipe, history }) {
     const newCookingSteps = [...CookingSteps]
     newCookingSteps.splice(e, 1)
     setCookingSteps(newCookingSteps);
+  }
+
+  function updateTags(e){
+    e.preventDefault();
+    const exists = Tags.find((t) => t === Tag)
+    if(exists){
+      console.log("Tag already exists")
+      return setTag("");
+    
+    }
+
+    setTags([...Tags,Tag]);
+    setTag("");
+    console.log("Tag Added")
+    console.log([...Tags,Tag])
+  }
+
+  function removeTag(tag){
+    const newTags = [...Tags];
+    newTags.splice(tag,1);
+    console.log(newTags)
+    setTags([...newTags]);
+  }
+
+  function isTagvalid(){
+    return Tag !== ""
   }
 
   function openSaveDialog(e) {
@@ -253,74 +288,85 @@ function CreateRecipe({ recipe, history }) {
     }
   }
 
+  const animateCreateRecipe = useSpring({...standardSpringFadeIn})
+
   return (
     <React.Fragment>
       {user.loggedIn ?
-        (<div style={style.FormCard}>
-          <div>
-          <Card style={style.Card}>
-            <CardMedia style={style.GridBottom} wide imageUrl={getPicture()}>
-              <Input style={style.PictureInput} type="file" name="file" id="file" accept="image/gif,image/png,image/jpeg" onChange={(e) => handleImageChange(e)} />
-              <div style={style.PictureLabel}>
-                <label className="mdc-button mdc-ripple-upgraded mdc-button--raised" htmlFor="file">Choose a picture</label>
-              </div>
-            </CardMedia>
+        (<animated.div style={animateCreateRecipe}>
+          <div style={style.FormCard}>
             <div>
-              <form style={style.Form} onSubmit={openSaveDialog} autoComplete="off">
-                <h1 style={style.Margins}>Recipe Name:</h1>
-                <TextField ><Input isValid={RecipeInformation.valid} value={RecipeInformation.name} onChange={(e) => setRecipeInformation({ ...RecipeInformation, name: e.target.value, valid: e.target.value.length >= 1 })} /></TextField>
-                <div className="IngredientsBlock" style={style.Ingredients}>
-                  <div style={style.IngredientRow}><h2 style={style.Margins} >Ingredient</h2> <h2 style={style.Margins}>Amount</h2><h2 style={style.Margins}>Unit</h2></div>
-                  {
-                    Ingredients.map((ing, idx) => {
-                      return (<div style={style.IngredientRow} key={idx}>
-                        <TextField id={"textField-ingredient-" + idx} trailingIcon={null}><Input isValid={ing.ingredient.valid} id={"ingredient-" + idx} value={ing.ingredient.name} onChange={updateIngredient} /></TextField>
-                        <TextField ><Input isValid={ing.amount.valid} type="number" id={"amount-" + idx} value={ing.amount.name} onChange={updateIngredient} /></TextField>
-                        <Select id={"unit-" + idx} value={ing.unit.name.unit} onChange={updateIngredient}>
-                          {
-                            units.map((unit) => {
-                              return (
-                                <Option key={unit.unit} value={unit.unit}>{unit.name}</Option>
-                              )
-                            })
-                          }
-                        </Select>
-                        {<IconButton id={idx} onClick={(e) => removeIngridient(e)}><MaterialIcon icon='delete' /></IconButton>}
-                      </div>)
-                    })
-                  }
-                  <div style={style.GridCenter}><Button style={style.Button} raised onClick={addEmptyIngredient}>Add Ingredient</Button></div>
+            <Card style={style.Card}>
+              <CardMedia style={style.GridBottom} wide imageUrl={getPicture()}>
+                <Input style={style.PictureInput} type="file" name="file" id="file" accept="image/gif,image/png,image/jpeg" onChange={(e) => handleImageChange(e)} />
+                <div style={style.PictureLabel}>
+                  <label className="mdc-button mdc-ripple-upgraded mdc-button--raised" htmlFor="file">Choose a picture</label>
                 </div>
-
-                <div className="StepsBlock" >
-                  <div className="Steps" style={style.Steps}>{
-                    CookingSteps.map((step, idx) => {
-                      return (<div key={idx} >
-                        <TextField id={idx} style={{ width: "100%" }} trailingIcon={<MaterialIcon role="button" icon="delete" />} onTrailingIconSelect={removeCookingStep.bind(null, idx)} label={"Step " + (idx + 1)} textarea ><Input style={{ resize: "none", width: "100%" }} id={idx} value={step} onChange={updateCookingStep} /></TextField>
-                      </div>)
+              </CardMedia>
+              <div>
+                <form style={style.Form} onSubmit={openSaveDialog} autoComplete="off">
+                  <h1 style={style.Margins}>Recipe Name:</h1>
+                  <TextField ><Input isValid={RecipeInformation.valid} value={RecipeInformation.name} onChange={(e) => setRecipeInformation({ ...RecipeInformation, name: e.target.value, valid: e.target.value.length >= 1 })} /></TextField>
+                  <div className="IngredientsBlock" style={style.Ingredients}>
+                    <div style={style.IngredientRow}><h2 style={style.Margins} >Ingredient</h2> <h2 style={style.Margins}>Amount</h2><h2 style={style.Margins}>Unit</h2></div>
+                    {
+                      Ingredients.map((ing, idx) => {
+                        return (<div style={style.IngredientRow} key={idx}>
+                          <TextField id={"textField-ingredient-" + idx} trailingIcon={null}><Input isValid={ing.ingredient.valid} id={"ingredient-" + idx} value={ing.ingredient.name} onChange={updateIngredient} /></TextField>
+                          <TextField ><Input isValid={ing.amount.valid} type="number" id={"amount-" + idx} value={ing.amount.name} onChange={updateIngredient} /></TextField>
+                          <Select id={"unit-" + idx} value={ing.unit.name.unit} onChange={updateIngredient}>
+                            {
+                              units.map((unit) => {
+                                return (
+                                  <Option key={unit.unit} value={unit.unit}>{unit.name}</Option>
+                                )
+                              })
+                            }
+                          </Select>
+                          {<IconButton id={idx} onClick={(e) => removeIngridient(e)}><MaterialIcon icon='delete' /></IconButton>}
+                        </div>)
+                      })
                     }
-                    )
-                  }
+                    <div style={style.GridCenter}><Button style={style.Button} raised onClick={addEmptyIngredient}>Add Ingredient</Button></div>
                   </div>
-                  <div style={style.GridCenter}><Button style={style.Button} raised onClick={addEmptyCookingtStep}>Add Step</Button></div>
-                </div>
-                <br />
-                <Button raised disabled={!isRecipeValid()} type="submit"> Save Recipe </Button>
-                <Dialog
-                  onClose={(action) => submitRecipe(action)}
-                  open={SaveDialog}>
-                  <DialogTitle>Save {RecipeInformation.name} ?</DialogTitle>
-                  <DialogFooter>
-                    <DialogButton action='dismiss'>No</DialogButton>
-                    <DialogButton action='confirm' isDefault>Yes</DialogButton>
-                  </DialogFooter>
-                </Dialog>
-                <Button raised onClick={close}>Close Edit Mode</Button>
-              </form >
+
+                  <div className="StepsBlock" >
+                    <div className="Steps" style={style.Steps}>{
+                      CookingSteps.map((step, idx) => {
+                        return (<div key={idx} >
+                          <TextField id={idx} style={{ width: "100%" }} trailingIcon={<MaterialIcon role="button" icon="delete" />} onTrailingIconSelect={removeCookingStep.bind(null, idx)} label={"Step " + (idx + 1)} textarea ><Input style={{ resize: "none", width: "100%" }} id={idx} value={step} onChange={updateCookingStep} /></TextField>
+                        </div>)
+                      }
+                      )
+                    }
+                    </div>
+                    <div style={style.GridCenter}><Button style={style.Button} raised onClick={addEmptyCookingtStep}>Add Step</Button></div>
+                  </div>
+                  <div className="ChipsBlock">
+                  <TextField ><Input value={Tag} onChange={(e) => setTag(e.target.value)} /></TextField>
+                  <Button style={style.Button} disabled={!isTagvalid()} raised onClick={updateTags}>Add Tag</Button>
+                  <ChipSet>
+                  {Tags.map((t,i) => <Chip key={t+i} id={i} label={t} trailingIcon={<MaterialIcon icon='cancel'/>} handleTrailingIconInteraction={removeTag.bind(null,i)} />)}
+                  </ChipSet>
+                  </div>
+                  <br />
+                  <Button raised disabled={!isRecipeValid()} type="submit"> Save Recipe </Button>
+                  <Dialog
+                    onClose={(action) => submitRecipe(action)}
+                    open={SaveDialog}>
+                    <DialogTitle>Save {RecipeInformation.name} ?</DialogTitle>
+                    <DialogFooter>
+                      <DialogButton action='dismiss'>No</DialogButton>
+                      <DialogButton action='confirm' isDefault>Yes</DialogButton>
+                    </DialogFooter>
+                  </Dialog>
+                  <Button raised onClick={close}>Close Edit Mode</Button>
+                </form >
+              </div>
+            </Card>
             </div>
-          </Card>
-          </div>
-        </div >) : (<Redirect to="/" />)}
+          </div >
+        </animated.div>) : (<Redirect to="/" />)}
     </React.Fragment>);
 }
 

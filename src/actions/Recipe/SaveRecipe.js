@@ -1,18 +1,21 @@
-import axios from "axios"
+import {Data} from "../../api/api"
 
-export async function SaveNewRecipe( name, file , ingredients, cookingSteps) {
+export async function SaveNewRecipe( name, file , ingredients, cookingSteps,tags) {
   const recipeData = new FormData();
   recipeData.append("image", file);
   recipeData.append("name", name);
   recipeData.append("cookingSteps", cookingSteps);
   recipeData.append("ingredients", JSON.stringify(cleanIngredientsList(ingredients)));
+  recipeData.append("tags", tags);
 
-  const response = await SendRecipe(recipeData, "saveNewRecipe")
+  const response = await Data( "saveNewRecipe",recipeData)
+
+  console.log(response)
 
   return response.data
 }
 
-export async function SaveEditRecipe(information, ingredients, cookingSteps) {
+export async function SaveEditRecipe(information, ingredients, cookingSteps,tags) {
 
   const recipeData = new FormData();
   if (information.pictureLocal !== undefined && information.pictureLocal.use)
@@ -22,23 +25,13 @@ export async function SaveEditRecipe(information, ingredients, cookingSteps) {
   recipeData.append("name", information.name);
   recipeData.append("cookingSteps", JSON.stringify(cookingSteps));
   recipeData.append("ingredients", JSON.stringify(cleanIngredientsList(ingredients)));
-
-  const response = await SendRecipe(recipeData, "saveUpdatedRecipe")
+  recipeData.append("tags", JSON.stringify(tags));
+  
+  const response = await Data("saveUpdatedRecipe",recipeData)
 
   return response.data
 
 }
-
-async function SendRecipe(data, endpoint) {
-  const axiosData = {
-    method: 'post',
-    url: 'http://localhost:3090/' + endpoint,
-    data: data
-  }
-
-  return await axios(axiosData);
-}
-
 
 function cleanIngredientsList(ingredients) { return ingredients.map((ing) => { return { name: ing.ingredient.name.toString(), amount: ing.amount.name, unit: ing.unit.name } }) };
 

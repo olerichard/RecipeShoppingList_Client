@@ -24,7 +24,8 @@ export default function StandardRecipeCard({ recipe, listId }) {
   }
   const shoppingListContext = UseShoppingList();
   const shoppingList = shoppingListContext.ShoppingList;
-  const showAddToShoppingList = (listId === undefined || listId === "" || shoppingList === undefined || shoppingList === "No User" || shoppingList.recipes.some(r=> r._id === recipe._id)) ? false : true;  
+  const showShoppingList = shoppingList === false ? false:true
+  const showAddToShoppingList = (shoppingList.recipes !== undefined && shoppingList.recipes.some(r=> r._id === recipe._id)) ? false : true;  
 
   async function  addToShoppingList(list,id){
     await AddToShoppingList(list,id);
@@ -51,13 +52,14 @@ export default function StandardRecipeCard({ recipe, listId }) {
           </Link>
         </CardActionButtons>
         {
+          showShoppingList ?
            showAddToShoppingList ?   
           <CardActionButtons>
             <Button onClick={() => addToShoppingList(listId,recipe._id)}   >Add to ShoppingList</Button>
           </CardActionButtons>
           :<CardActionButtons>
             <Button onClick={() => removeFromShoppingList(listId,recipe._id)}   >Remove From ShoppingList</Button>
-          </CardActionButtons>
+          </CardActionButtons> : null
         }
       </CardActions>
     </Card >

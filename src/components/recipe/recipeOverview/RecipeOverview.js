@@ -8,6 +8,7 @@ import { UseUser } from '../../../context/user-context';
 import MaterialIcon from '@material/react-material-icon';
 import { UseShoppingList } from '../../../context/shoppingList-context';
 import {useTrail,animated} from 'react-spring'
+import {standardTrailFadeIn} from '../../../animations/animations'
 
 
 function RecipeOverview({ history }) {
@@ -41,12 +42,7 @@ function RecipeOverview({ history }) {
     }
   }
 
-  const animateOverview = useTrail(Recipes.length,{
-    opacity: 1,
-    transform: 'translate3d(0,0,0)',
-    from: { opacity: 0 ,transform: 'translate3d(0,-70px,0)' },
-    config : { duration:500 }
-  });
+  const animateOverview = useTrail(Recipes.length,{...standardTrailFadeIn});
 
   return (
     <div>

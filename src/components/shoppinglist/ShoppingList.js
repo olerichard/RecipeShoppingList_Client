@@ -14,7 +14,7 @@ import '@material/react-tab-indicator/dist/tab-indicator.css';
   
   const shoppingList = UseShoppingList().ShoppingList;
   const settings = UseSettings().Settings.ShoppingList;
-  const renderList = (settings.showList && shoppingList.recipes !== undefined && shoppingList.recipes !== null && shoppingList.recipes !== "" && shoppingList.recipes.length > 0 );
+  const renderList = (shoppingList && settings.showList && shoppingList.recipes !== undefined && shoppingList.recipes !== null && shoppingList.recipes !== "" && shoppingList.recipes.length > 0 );
   
   const [ActiveIndex,SetActiveIndex] = useState(settings.showRecipes ? 0:1);
 

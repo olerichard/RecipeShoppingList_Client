@@ -12,7 +12,7 @@ export  function ShoppingListProvider({ children }) {
   function UpdateShoppingList(){
     const awaitShoppingList = async () => {
       const fetchedShoppingList = await GetShoppingList(user._id);
-      SetShoppingList({ ...fetchedShoppingList });
+      SetShoppingList( fetchedShoppingList ?  { ...fetchedShoppingList } : false);
     };
     awaitShoppingList();
   }
@@ -20,7 +20,7 @@ export  function ShoppingListProvider({ children }) {
   useEffect(() => {
     const awaitShoppingList = async () => {
       const fetchedShoppingList = await GetShoppingList(user._id);
-      SetShoppingList({ ...fetchedShoppingList });
+      SetShoppingList( fetchedShoppingList ?  { ...fetchedShoppingList } : false);
     };
     
     awaitShoppingList();

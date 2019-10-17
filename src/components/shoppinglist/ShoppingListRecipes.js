@@ -2,18 +2,13 @@ import React from 'react'
 import StandardRecipeCard from '../recipe/recipeCards/StandardRecipeCard';
 
 import {useTrail,animated} from 'react-spring'
+import {standardTrailFadeIn} from '../../animations/animations'
 
  export default function ShoppingListRecipes({shoppingList}) {
   
     const recipes = shoppingList.recipes;
   
-  const animateList= useTrail(recipes.length,{
-    opacity: 1,
-    transform: 'translate3d(0,0,0)',
-    from: { opacity: 0 ,transform: 'translate3d(0,0px,0)' },
-    config : { duration:500 }
-  });
-
+  const animateList= useTrail(recipes.length,{...standardTrailFadeIn});
 
   const style = {
     Card:{
